@@ -175,7 +175,7 @@ function showView(id) {
   });
 
   // Hooks when entering views
-  if (id === 'view-instructions') { switchInstrLang(instrLang); startInstrCountdown(); }
+  if (id === 'view-instructions') { switchInstrLang(instrLang); initInstrButton(); }
   if (id === 'view-dashboard') updateFinishBtn();
   if (id === 'view-module-a') { renderModuleA(); updateModuleAFinishBtn(); }
   if (id === 'view-module-b') renderModuleB();
@@ -243,8 +243,15 @@ function switchInstrLang(lang) {
 }
 
 let instrCountdownTimer = null;
-function startInstrCountdown() {
+function initInstrButton() {
   const btn = document.getElementById('btn-confirm-enter');
+  if (instrCountdownTimer) clearInterval(instrCountdownTimer);
+  // Only enforce countdown on first visit (before instrSeen is set)
+  if (localStorage.getItem('instrSeen')) {
+    btn.disabled = false;
+    btn.textContent = 'Confirm & Enter / 确认进入';
+    return;
+  }
   btn.disabled = true;
   let remaining = 10;
   const updateLabel = () => {
@@ -254,7 +261,6 @@ function startInstrCountdown() {
     btn.disabled = remaining > 0;
   };
   updateLabel();
-  if (instrCountdownTimer) clearInterval(instrCountdownTimer);
   instrCountdownTimer = setInterval(() => {
     remaining--;
     updateLabel();
@@ -286,14 +292,14 @@ function renderModuleA() {
   const prefs = getPreferences().filter(p => p.user_id === currentUser && p.language === currentLangA);
   const ratedSet = new Set(prefs.map(p => p.video_id));
 
-  const ratedCount = prefs.length;
+  const allPrefsProgress = getPreferences().filter(p => p.user_id === currentUser);
+  const zhProgress = allPrefsProgress.filter(p => p.language === 'ZH').length;
+  const enProgress = allPrefsProgress.filter(p => p.language === 'EN').length;
   let progressText;
   if (userLang === 'EN') {
-    progressText = currentLangA === 'EN'
-      ? `Completed: ${ratedCount}/20`
-      : `Completed: ${ratedCount} (Optional)`;
+    progressText = `Vertical: ${zhProgress}/Optional | Horizontal: ${enProgress}/20`;
   } else {
-    progressText = `Completed: ${ratedCount}/15`;
+    progressText = `Vertical: ${zhProgress}/10 | Horizontal: ${enProgress}/10`;
   }
   document.getElementById('a-progress').textContent = progressText;
 
@@ -423,13 +429,14 @@ function showRatingToast() {
 }
 
 function updatePlayerProgress() {
-  const prefs = getPreferences().filter(p => p.user_id === currentUser && p.language === currentLangA);
-  const count = prefs.length;
+  const allPrefs = getPreferences().filter(p => p.user_id === currentUser);
+  const zhCount = allPrefs.filter(p => p.language === 'ZH').length;
+  const enCount = allPrefs.filter(p => p.language === 'EN').length;
   let text;
   if (userLang === 'EN') {
-    text = currentLangA === 'EN' ? `${count}/20` : `${count} (optional)`;
+    text = `Vertical: ${zhCount}/Optional | Horizontal: ${enCount}/20`;
   } else {
-    text = `${count}/15`;
+    text = `Vertical: ${zhCount}/10 | Horizontal: ${enCount}/10`;
   }
   const el = document.getElementById('a-progress-player');
   if (el) el.textContent = text;
@@ -448,7 +455,7 @@ function updateModuleAFinishBtn() {
     label = ready ? 'Finish A ✓' : `Finish A (V${zhRated} H${enRated})`;
   }
   const btn = document.getElementById('btn-finish-a');
-  if (btn) { btn.disabled = !ready; btn.textContent = label; }
+  if (btn) { btn.disabled = !ready; btn.textContent = label; btn.classList.toggle('btn-finish-ready', ready); }
 }
 
 function enterExperiment() {
@@ -479,6 +486,7 @@ function updateFinishBtn() {
   const btn = document.getElementById('btn-finish');
   btn.disabled = !ready;
   btn.textContent = label;
+  btn.classList.toggle('btn-finish-ready', ready);
 }
 
 function finishStudy() {
