@@ -232,7 +232,7 @@ function renderModuleA() {
 
   const count = vids.length;
   const ratedCount = prefs.length;
-  document.getElementById('a-progress').textContent = `Completed: ${ratedCount} / 25`;
+  document.getElementById('a-progress').textContent = `Completed: ${ratedCount}`;
 
   vids.forEach((vid, idx) => {
     const displayNum = String(idx + 1).padStart(2, '0');
@@ -344,13 +344,16 @@ function finishStudy() {
   btn.disabled = true;
   btn.textContent = 'Saving…';
 
+  // Google Apps Script requires no-cors + text/plain for cross-origin POST
   fetch(SHEETS_URL, {
     method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(data)
   })
     .then(() => {
       btn.textContent = 'Saved ✓';
-      exportData(); // also download local backup
+      exportData();
       alert('Your data has been saved. Thank you!');
     })
     .catch(() => {
