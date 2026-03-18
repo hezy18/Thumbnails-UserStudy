@@ -242,15 +242,13 @@ function renderModuleA() {
 
     const img = document.createElement('img');
     img.className = 'card-thumb';
+    img.loading = 'lazy';
     img.alt = `Video ${displayNum}`;
     // Try pre-generated thumbnail first; on error, fall back to canvas capture
     const thumbSrc = `thumbnail/a-${currentLangA}/${vid}.jpg`;
     const videoSrc = `${VIDEO_BASE_URL}/${VIDEO_FOLDER[currentLangA]}/${vid}.mp4`;
     img.src = thumbSrc;
-    img.onerror = () => {
-      img.onerror = null; // prevent loop
-      requestThumbnail(img, videoSrc);
-    };
+    img.onerror = () => { img.onerror = null; }; // show grey placeholder if missing
 
     const label = document.createElement('div');
     label.className = 'card-label';
