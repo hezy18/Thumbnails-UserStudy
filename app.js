@@ -246,7 +246,7 @@ function openPlayerA(vid) {
   currentVideoA = vid;
   ratingA = 0;
   watchMaxPos = 0;
-  document.getElementById('player-a-title').textContent = `[${currentLangA}] ${vid}`;
+  document.getElementById('player-a-title').textContent = 'Video Rating';
 
   const videoEl = document.getElementById('video-a');
   videoEl.querySelector('source').src = `${VIDEO_BASE_URL}/a-${currentLangA}/${vid}.mp4`;
