@@ -12,8 +12,8 @@ let users = [];                // [{id, password}]
 let assignments = {};          // {userId: [videoId, ...]}
 let ratingA = 0;               // temp star value for module A
 let currentVideoA = null;      // video id being rated
-let currentLangA = 'CH';       // selected language for Module A ('CH' or 'EN')
-let videoListA = { CH: [], EN: [] }; // filenames loaded from manifest
+let currentLangA = 'ZH';       // selected language for Module A ('ZH' or 'EN')
+let videoListA = { ZH: [], EN: [] }; // filenames loaded from manifest
 let watchMaxPos = 0;           // furthest playback position reached (seconds)
 let currentVideoB = null;      // video id in module B
 let selectedThumb = null;      // chosen thumbnail (1-6)
@@ -95,7 +95,7 @@ async function loadUsers() {
 }
 
 async function loadVideoListA() {
-  for (const lang of ['CH', 'EN']) {
+  for (const lang of ['ZH', 'EN']) {
     try {
       const res = await fetch(`data/videos-a-${lang}.txt`);
       const text = await res.text();
