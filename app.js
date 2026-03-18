@@ -273,9 +273,16 @@ function openPlayerA(vid) {
   videoEl.querySelector('source').src = `${VIDEO_BASE_URL}/${VIDEO_FOLDER[currentLangA]}/${vid}.mp4`;
   videoEl.load();
 
-  // Track the furthest position the user has watched
+  // Track furthest position & block seeking (no scrubbing allowed)
+  let lastSafeTime = 0;
   videoEl.ontimeupdate = () => {
     if (videoEl.currentTime > watchMaxPos) watchMaxPos = videoEl.currentTime;
+    if (!videoEl.seeking) lastSafeTime = videoEl.currentTime;
+  };
+  videoEl.onseeking = () => {
+    if (videoEl.currentTime > lastSafeTime + 1.5) {
+      videoEl.currentTime = lastSafeTime;
+    }
   };
 
   // Wire up Likert columns as the clickable rating UI
@@ -296,7 +303,8 @@ function submitRatingA() {
   const videoEl = document.getElementById('video-a');
   const duration = videoEl.duration || 0;
   const watchRatio = duration > 0 ? parseFloat((watchMaxPos / duration).toFixed(3)) : 0;
-  videoEl.ontimeupdate = null; // stop tracking
+  videoEl.ontimeupdate = null;
+  videoEl.onseeking = null;
 
   savePreference({
     user_id: currentUser,
