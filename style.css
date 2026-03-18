@@ -62,6 +62,8 @@ body {
 .btn-finish { background: #e67e22; color: #fff; }
 .btn-finish:hover:not(:disabled) { background: #ca6f1e; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.finish-status-ok  { font-size: 13px; color: #27ae60; font-weight: 600; }
+.finish-status-err { font-size: 13px; color: #e74c3c; font-weight: 600; }
 
 /* Dashboard */
 .dashboard { padding: 60px 30px; max-width: 900px; margin: 0 auto; }

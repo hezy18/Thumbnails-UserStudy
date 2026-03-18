@@ -335,14 +335,20 @@ function updateFinishBtn() {
 }
 
 function finishStudy() {
-  const totalVideos = videoListA.CH.length + videoListA.EN.length;
-  const rated = getPreferences().filter(p => p.user_id === currentUser).length;
-  if (!confirm(`You have rated ${rated} / ${totalVideos} videos.\nYour data will be saved automatically. Continue?`)) return;
-
   const data = getPreferences().filter(p => p.user_id === currentUser);
+  const zhCount = data.filter(p => p.language === 'ZH').length;
+  const enCount = data.filter(p => p.language === 'EN').length;
+  if (!confirm(`Submit your ratings?\n\nVertical: ${zhCount} videos\nHorizontal: ${enCount} videos\n\nA backup file will also be downloaded.`)) return;
+
   const btn = document.getElementById('btn-finish');
+  const status = document.getElementById('finish-status');
   btn.disabled = true;
-  btn.textContent = 'Saving…';
+  btn.textContent = 'Sending…';
+  status.textContent = '';
+  status.className = '';
+
+  // Always download local backup immediately — data is never lost even if network fails
+  exportData();
 
   // Google Apps Script requires no-cors + text/plain for cross-origin POST
   fetch(SHEETS_URL, {
@@ -352,14 +358,15 @@ function finishStudy() {
     body: JSON.stringify(data)
   })
     .then(() => {
-      btn.textContent = 'Saved ✓';
-      exportData();
-      alert('Your data has been saved. Thank you!');
+      btn.textContent = 'Finish A ✓';
+      status.textContent = '✓ Sent successfully. Backup file also downloaded.';
+      status.className = 'finish-status-ok';
     })
     .catch(() => {
       btn.disabled = false;
       updateFinishBtn();
-      alert('Network error — please use "Export Data" as a backup and send the file to the researcher.');
+      status.textContent = '✗ Network error. Use "Export Data" and send the file manually.';
+      status.className = 'finish-status-err';
     });
 }
 
