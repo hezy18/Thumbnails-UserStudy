@@ -175,7 +175,7 @@ function showView(id) {
   });
 
   // Hooks when entering views
-  if (id === 'view-instructions') switchInstrLang(instrLang);
+  if (id === 'view-instructions') { switchInstrLang(instrLang); startInstrCountdown(); }
   if (id === 'view-dashboard') updateFinishBtn();
   if (id === 'view-module-a') { renderModuleA(); updateModuleAFinishBtn(); }
   if (id === 'view-module-b') renderModuleB();
@@ -240,6 +240,26 @@ function switchInstrLang(lang) {
   document.querySelectorAll('.instr-lang-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.lang === lang);
   });
+}
+
+let instrCountdownTimer = null;
+function startInstrCountdown() {
+  const btn = document.getElementById('btn-confirm-enter');
+  btn.disabled = true;
+  let remaining = 10;
+  const updateLabel = () => {
+    btn.textContent = remaining > 0
+      ? `Please read the instructions (${remaining}s) / 请阅读说明 (${remaining}s)`
+      : 'Confirm & Enter / 确认进入';
+    btn.disabled = remaining > 0;
+  };
+  updateLabel();
+  if (instrCountdownTimer) clearInterval(instrCountdownTimer);
+  instrCountdownTimer = setInterval(() => {
+    remaining--;
+    updateLabel();
+    if (remaining <= 0) clearInterval(instrCountdownTimer);
+  }, 1000);
 }
 
 // ============================================================
@@ -358,15 +378,9 @@ function submitRatingA() {
     timestamp: new Date().toISOString()
   });
 
-  // Show toast and auto-advance to next unrated video
+  // Show toast and return to grid for user to pick next video
   showRatingToast();
-  updatePlayerProgress();
-  const nextVid = getNextUnratedVideo();
-  if (nextVid) {
-    setTimeout(() => openPlayerA(nextVid), 900);
-  } else {
-    setTimeout(() => showView('view-module-a'), 900);
-  }
+  showView('view-module-a');
 }
 
 // ============================================================

@@ -97,8 +97,8 @@
           </div>
         </div>
 
-        <button class="btn btn-primary btn-enter" onclick="enterExperiment()">
-          Confirm &amp; Enter &nbsp;/&nbsp; 确认进入
+        <button class="btn btn-primary btn-enter" id="btn-confirm-enter" onclick="enterExperiment()" disabled>
+          Please read the instructions (10s) / 请阅读说明 (10s)
         </button>
         <div class="instr-dashboard-link">
           <a href="#" onclick="showView('view-dashboard');return false;">Go to Dashboard / Module B →</a>
@@ -214,10 +214,7 @@
             <div class="likert-circle"></div>
           </div>
         </div>
-        <div class="player-actions">
-          <button class="btn btn-outline-skip" onclick="openNextUnratedA()">Skip / 跳过 →</button>
-          <button class="btn btn-primary" id="btn-submit-rating" onclick="submitRatingA()">Submit Rating / 提交评分</button>
-        </div>
+        <button class="btn btn-primary" id="btn-submit-rating" onclick="submitRatingA()">Submit Rating / 提交评分</button>
       </div>
     </div>
   </div>
