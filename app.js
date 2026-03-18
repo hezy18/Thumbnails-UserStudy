@@ -18,6 +18,7 @@ let currentLangA = 'ZH';       // selected language for Module A ('ZH' or 'EN')
 let videoListA = { ZH: [], EN: [] }; // filenames loaded from manifest
 let watchMaxPos = 0;           // furthest playback position reached (seconds)
 let instrLang = 'en';          // instruction page language ('en' or 'zh')
+let userLang = null;           // user's selected language ('ZH' or 'EN')
 let currentVideoB = null;      // video id in module B
 let selectedThumb = null;      // chosen thumbnail (1-6)
 let ratingsB = { quality: 0, relevance: 0, preference: 0 };
@@ -72,12 +73,20 @@ function processThumbQueue() {
 // ============================================================
 window.addEventListener('DOMContentLoaded', async () => {
   await Promise.all([loadUsers(), loadAssignments(), loadVideoListA()]);
-  // Check if already logged in
+  // Restore logged-in session
   const saved = localStorage.getItem('currentUser');
   if (saved) {
     currentUser = saved;
     syncUserLabels(currentUser);
-    showView('view-instructions');
+    const savedLang = localStorage.getItem('userLang');
+    if (savedLang) {
+      userLang = savedLang;
+      currentLangA = savedLang === 'ZH' ? 'ZH' : 'EN';
+      instrLang = savedLang === 'ZH' ? 'zh' : 'en';
+      showView('view-instructions');
+    } else {
+      showView('view-lang-select');
+    }
   }
 });
 
@@ -154,6 +163,7 @@ function showView(id) {
   document.getElementById(id).classList.add('active');
 
   // Hooks when entering views
+  if (id === 'view-instructions') switchInstrLang(instrLang);
   if (id === 'view-dashboard') updateFinishBtn();
   if (id === 'view-module-a') renderModuleA();
   if (id === 'view-module-b') renderModuleB();
@@ -177,15 +187,27 @@ function doLogin() {
   currentUser = uid;
   localStorage.setItem('currentUser', uid);
   syncUserLabels(uid);
-  showView('view-instructions');
+  showView('view-lang-select');
 }
 
 function doLogout() {
   currentUser = null;
+  userLang = null;
+  currentLangA = 'ZH';
+  instrLang = 'en';
   localStorage.removeItem('currentUser');
+  localStorage.removeItem('userLang');
   document.getElementById('input-uid').value = '';
   document.getElementById('input-pwd').value = '';
   showView('view-login');
+}
+
+function selectLang(lang) {
+  userLang = lang;
+  localStorage.setItem('userLang', lang);
+  currentLangA = lang === 'ZH' ? 'ZH' : 'EN';
+  instrLang = lang === 'ZH' ? 'zh' : 'en';
+  showView('view-instructions');
 }
 
 function syncUserLabels(uid) {
@@ -230,9 +252,16 @@ function renderModuleA() {
   const prefs = getPreferences().filter(p => p.user_id === currentUser && p.language === currentLangA);
   const ratedSet = new Set(prefs.map(p => p.video_id));
 
-  const count = vids.length;
   const ratedCount = prefs.length;
-  document.getElementById('a-progress').textContent = `Completed: ${ratedCount}`;
+  let progressText;
+  if (userLang === 'EN') {
+    progressText = currentLangA === 'EN'
+      ? `Completed: ${ratedCount}/20`
+      : `Completed: ${ratedCount} (Optional)`;
+  } else {
+    progressText = `Completed: ${ratedCount}/15`;
+  }
+  document.getElementById('a-progress').textContent = progressText;
 
   vids.forEach((vid, idx) => {
     const displayNum = String(idx + 1).padStart(2, '0');
@@ -318,18 +347,28 @@ function submitRatingA() {
 }
 
 // ============================================================
-// Finish button (active when >= 20 Vertical AND >= 20 Horizontal)
+// Finish button — thresholds differ by userLang:
+//   ZH: >= 10 Vertical AND >= 10 Horizontal
+//   EN: >= 20 Horizontal (Vertical optional)
 // ============================================================
 function updateFinishBtn() {
   const allPrefs = getPreferences().filter(p => p.user_id === currentUser);
   const zhRated = allPrefs.filter(p => p.language === 'ZH').length;
   const enRated = allPrefs.filter(p => p.language === 'EN').length;
-  const ready = zhRated >= 20 && enRated >= 20;
+
+  let ready, label;
+  if (userLang === 'EN') {
+    ready = enRated >= 20;
+    label = ready ? 'Finish A ✓' : `Finish A (Horizontal ${enRated}/20)`;
+  } else {
+    // ZH users (also default for null / unknown)
+    ready = zhRated >= 10 && enRated >= 10;
+    label = ready ? 'Finish A ✓' : `Finish A (Vertical ${zhRated}/10, Horizontal ${enRated}/10)`;
+  }
+
   const btn = document.getElementById('btn-finish');
   btn.disabled = !ready;
-  btn.textContent = ready
-    ? 'Finish A ✓'
-    : `Finish A (Vertical ${zhRated}/20, Horizontal ${enRated}/20)`;
+  btn.textContent = label;
 }
 
 function finishStudy() {
