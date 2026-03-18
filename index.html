@@ -21,27 +21,109 @@
     </div>
   </div>
 
+  <!-- INSTRUCTIONS VIEW -->
+  <div id="view-instructions" class="view">
+    <div class="header">
+      <div class="header-left">
+        <h2>Instructions / 实验说明</h2>
+      </div>
+      <div class="header-right">
+        <span id="user-label-instr"></span>
+        <button class="btn btn-secondary" onclick="doLogout()">Logout</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="instr-container">
+        <div class="instr-lang-toggle">
+          <button class="instr-lang-btn active" data-lang="en" onclick="switchInstrLang('en')">English</button>
+          <button class="instr-lang-btn" data-lang="zh" onclick="switchInstrLang('zh')">中文</button>
+        </div>
+
+        <!-- English Instructions -->
+        <div id="instr-en" class="instr-body">
+          <h2>Experimental Instructions</h2>
+          <p class="instr-intro">This experiment consists of two parts: <strong>Module A (Interest Collection)</strong> and <strong>Module B (Thumbnail Selection)</strong>. For this study, you are only required to complete <strong>Module A</strong>.</p>
+
+          <div class="instr-section">
+            <h3>Steps</h3>
+            <ol class="instr-steps">
+              <li>Enter <strong>Module A</strong>. You will see two sources of short videos: <strong>Vertical</strong> and <strong>Horizontal</strong>.</li>
+              <li>Browse the selection pages and pick videos that genuinely interest you.</li>
+              <li>Watch the video and provide a rating based on your level of interest.</li>
+              <li>If a video is not to your liking, you may pause it at any time and return to the list.</li>
+              <li>Please aim to complete <strong>20–30 videos</strong> for each source.</li>
+              <li>Once finished, return to the module selection page and click the <strong>'Finish'</strong> button in the top-right corner.</li>
+            </ol>
+          </div>
+
+          <div class="instr-goal">
+            <h3>Our Goal</h3>
+            <p>We value your authentic interests and viewing preferences. Your honest feedback is crucial for our research — there are no right or wrong answers. Please take your time to explore content that truly resonates with you.</p>
+          </div>
+        </div>
+
+        <!-- Chinese Instructions -->
+        <div id="instr-zh" class="instr-body" style="display:none">
+          <h2>实验说明</h2>
+          <p class="instr-intro">本实验分为两个部分：<strong>模块 A（兴趣收集）</strong>与<strong>模块 B（封面选择）</strong>。本次试验您只需要完成<strong>模块 A</strong>。</p>
+
+          <div class="instr-section">
+            <h3>操作步骤</h3>
+            <ol class="instr-steps">
+              <li>进入<strong>模块 A</strong>。您会看到两个视频来源：<strong>竖版视频</strong>与<strong>横版视频</strong>。</li>
+              <li>在选择页面中挑选您感兴趣的视频点击观看。</li>
+              <li>请根据您对视频内容的真实兴趣程度进行打分。</li>
+              <li>如果您对某个视频完全不感兴趣，可以随时暂停并返回列表。</li>
+              <li>请在每个视频来源中分别完成 <strong>20–30 个</strong>视频的观看与打分。</li>
+              <li>全部完成后，回到模块选择页面，点击右上角的 <strong>"Finish"</strong> 按钮。</li>
+            </ol>
+          </div>
+
+          <div class="instr-goal">
+            <h3>我们的期望</h3>
+            <p>我们希望了解您的真实兴趣想法和观看偏好。您的反馈对我们的研究至关重要，实验结果没有对错之分，请根据您的真实感受进行操作。</p>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-enter" onclick="showView('view-dashboard')">
+          Confirm &amp; Enter &nbsp;/&nbsp; 确认进入
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- DASHBOARD VIEW -->
   <div id="view-dashboard" class="view">
     <div class="header">
-      <h2>Dashboard</h2>
+      <div class="header-left">
+        <button class="btn btn-outline-instr" onclick="showView('view-instructions')">&#128203; Instructions / 说明</button>
+        <h2>Dashboard</h2>
+      </div>
       <div class="header-right">
         <span id="user-label"></span>
         <button class="btn btn-secondary" onclick="doLogout()">Logout</button>
         <button class="btn btn-success" onclick="exportData()">Export Data</button>
-        <button id="btn-finish" class="btn btn-finish" onclick="finishStudy()" disabled>Finish A (0% / 30% required)</button>
+        <button id="btn-finish" class="btn btn-finish" onclick="finishStudy()" disabled>Finish A</button>
       </div>
     </div>
     <div class="dashboard">
-      <h1>Choose a Module</h1>
+      <h1>Choose a Module &nbsp;<span class="dashboard-h1-cn">选择模块</span></h1>
       <div class="module-cards">
         <div class="module-card" onclick="showView('view-module-a')">
-          <h3>Module A</h3>
-          <p>User Preference Collection<br><br>Browse 100 videos, watch and rate each one on a 1–5 star scale.</p>
+          <h3>Module A &nbsp;<span class="card-title-cn">模块 A</span></h3>
+          <p>
+            <strong>Interest Collection</strong> / <strong>兴趣收集</strong><br><br>
+            Browse short videos, watch and rate each one based on your level of interest.<br>
+            <span class="card-cn">浏览短视频，根据您的兴趣程度对每个视频进行评分。</span>
+          </p>
         </div>
         <div class="module-card" onclick="showView('view-module-b')">
-          <h3>Module B</h3>
-          <p>Thumbnail Comparison Experiment<br><br>Pick from 6 thumbnail options, watch the video, and fill out a short questionnaire.</p>
+          <h3>Module B &nbsp;<span class="card-title-cn">模块 B</span></h3>
+          <p>
+            <strong>Thumbnail Selection</strong> / <strong>封面选择</strong><br><br>
+            Pick from 6 thumbnail options, watch the video, and fill out a short questionnaire.<br>
+            <span class="card-cn">从 6 个封面选项中选择，观看视频并填写问卷。</span>
+          </p>
         </div>
       </div>
     </div>
@@ -50,16 +132,19 @@
   <!-- MODULE A: Video List -->
   <div id="view-module-a" class="view">
     <div class="header">
-      <h2>Module A — Preference Collection</h2>
+      <div class="header-left">
+        <button class="btn btn-outline-instr" onclick="showView('view-instructions')">&#128203; Instructions / 说明</button>
+        <h2>Module A — Interest Collection / 兴趣收集</h2>
+      </div>
       <div class="header-right">
         <span id="a-progress"></span>
-        <button class="btn btn-secondary" onclick="showView('view-dashboard')">Back</button>
+        <button class="btn btn-secondary" onclick="showView('view-dashboard')">Back / 返回</button>
       </div>
     </div>
     <div class="content">
       <div class="lang-tabs">
-        <button class="lang-tab active" data-lang="ZH" onclick="switchLangA('ZH')">ZH</button>
-        <button class="lang-tab" data-lang="EN" onclick="switchLangA('EN')">EN</button>
+        <button class="lang-tab active" data-lang="ZH" onclick="switchLangA('ZH')">Vertical <span class="tab-cn">竖版</span></button>
+        <button class="lang-tab" data-lang="EN" onclick="switchLangA('EN')">Horizontal <span class="tab-cn">横版</span></button>
       </div>
       <div id="grid-a" class="video-grid"></div>
     </div>
@@ -68,9 +153,12 @@
   <!-- MODULE A: Player + Rating -->
   <div id="view-player-a" class="view">
     <div class="header">
-      <h2 id="player-a-title">Video</h2>
+      <div class="header-left">
+        <button class="btn btn-outline-instr" onclick="showView('view-instructions')">&#128203; Instructions / 说明</button>
+        <h2 id="player-a-title">Video Rating</h2>
+      </div>
       <div class="header-right">
-        <button class="btn btn-secondary" onclick="showView('view-module-a')">Back to List</button>
+        <button class="btn btn-secondary" onclick="showView('view-module-a')">Back to List / 返回列表</button>
       </div>
     </div>
     <div class="content">
@@ -109,7 +197,7 @@
             <div class="likert-circle"></div>
           </div>
         </div>
-        <button class="btn btn-primary" onclick="submitRatingA()">Submit Rating</button>
+        <button class="btn btn-primary" onclick="submitRatingA()">Submit Rating / 提交评分</button>
       </div>
     </div>
   </div>
@@ -117,10 +205,13 @@
   <!-- MODULE B: Task List -->
   <div id="view-module-b" class="view">
     <div class="header">
-      <h2>Module B — Thumbnail Experiment</h2>
+      <div class="header-left">
+        <button class="btn btn-outline-instr" onclick="showView('view-instructions')">&#128203; Instructions / 说明</button>
+        <h2>Module B — Thumbnail Experiment</h2>
+      </div>
       <div class="header-right">
         <span id="b-progress"></span>
-        <button class="btn btn-secondary" onclick="showView('view-dashboard')">Back</button>
+        <button class="btn btn-secondary" onclick="showView('view-dashboard')">Back / 返回</button>
       </div>
     </div>
     <div class="content">
@@ -131,7 +222,9 @@
   <!-- MODULE B: Thumbnail Selection -->
   <div id="view-thumb-select" class="view">
     <div class="header">
-      <h2 id="thumb-title">Choose a Thumbnail</h2>
+      <div class="header-left">
+        <h2 id="thumb-title">Choose a Thumbnail</h2>
+      </div>
       <div class="header-right">
         <button class="btn btn-secondary" onclick="showView('view-module-b')">Back</button>
       </div>
@@ -147,7 +240,9 @@
   <!-- MODULE B: Video + Questionnaire -->
   <div id="view-player-b" class="view">
     <div class="header">
-      <h2 id="player-b-title">Video</h2>
+      <div class="header-left">
+        <h2 id="player-b-title">Video</h2>
+      </div>
       <div class="header-right">
         <button class="btn btn-secondary" onclick="showView('view-module-b')">Back</button>
       </div>

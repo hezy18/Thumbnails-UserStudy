@@ -17,6 +17,7 @@ let currentVideoA = null;      // video id being rated
 let currentLangA = 'ZH';       // selected language for Module A ('ZH' or 'EN')
 let videoListA = { ZH: [], EN: [] }; // filenames loaded from manifest
 let watchMaxPos = 0;           // furthest playback position reached (seconds)
+let instrLang = 'en';          // instruction page language ('en' or 'zh')
 let currentVideoB = null;      // video id in module B
 let selectedThumb = null;      // chosen thumbnail (1-6)
 let ratingsB = { quality: 0, relevance: 0, preference: 0 };
@@ -75,8 +76,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   const saved = localStorage.getItem('currentUser');
   if (saved) {
     currentUser = saved;
-    document.getElementById('user-label').textContent = currentUser;
-    showView('view-dashboard');
+    syncUserLabels(currentUser);
+    showView('view-instructions');
   }
 });
 
@@ -175,8 +176,8 @@ function doLogin() {
   errEl.style.display = 'none';
   currentUser = uid;
   localStorage.setItem('currentUser', uid);
-  document.getElementById('user-label').textContent = uid;
-  showView('view-dashboard');
+  syncUserLabels(uid);
+  showView('view-instructions');
 }
 
 function doLogout() {
@@ -185,6 +186,24 @@ function doLogout() {
   document.getElementById('input-uid').value = '';
   document.getElementById('input-pwd').value = '';
   showView('view-login');
+}
+
+function syncUserLabels(uid) {
+  document.querySelectorAll('#user-label, #user-label-instr').forEach(el => {
+    el.textContent = uid;
+  });
+}
+
+// ============================================================
+// Instructions page
+// ============================================================
+function switchInstrLang(lang) {
+  instrLang = lang;
+  document.getElementById('instr-en').style.display = lang === 'en' ? 'block' : 'none';
+  document.getElementById('instr-zh').style.display = lang === 'zh' ? 'block' : 'none';
+  document.querySelectorAll('.instr-lang-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
 }
 
 // ============================================================
@@ -213,7 +232,7 @@ function renderModuleA() {
 
   const count = vids.length;
   const ratedCount = prefs.length;
-  document.getElementById('a-progress').textContent = `${currentLangA}: ${ratedCount} / ${count} rated`;
+  document.getElementById('a-progress').textContent = `Completed: ${ratedCount} / 25`;
 
   vids.forEach((vid, idx) => {
     const displayNum = String(idx + 1).padStart(2, '0');
@@ -293,17 +312,18 @@ function submitRatingA() {
 }
 
 // ============================================================
-// Finish button (active at >= 30% completion across CH + EN)
+// Finish button (active when >= 20 Vertical AND >= 20 Horizontal)
 // ============================================================
 function updateFinishBtn() {
-  const totalVideos = videoListA.CH.length + videoListA.EN.length;
-  if (totalVideos === 0) return;
-  const rated = getPreferences().filter(p => p.user_id === currentUser).length;
-  const pct = Math.round((rated / totalVideos) * 100);
+  const allPrefs = getPreferences().filter(p => p.user_id === currentUser);
+  const zhRated = allPrefs.filter(p => p.language === 'ZH').length;
+  const enRated = allPrefs.filter(p => p.language === 'EN').length;
+  const ready = zhRated >= 20 && enRated >= 20;
   const btn = document.getElementById('btn-finish');
-  const ready = rated / totalVideos >= 0.3;
   btn.disabled = !ready;
-  btn.textContent = ready ? `Finish A (${pct}% done)` : `Finish A (${pct}% / 30% required)`;
+  btn.textContent = ready
+    ? 'Finish A ✓'
+    : `Finish A (Vertical ${zhRated}/20, Horizontal ${enRated}/20)`;
 }
 
 function finishStudy() {
