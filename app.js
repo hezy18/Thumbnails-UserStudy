@@ -2,7 +2,7 @@
 // Config — update VIDEO_BASE_URL to wherever your videos are hosted
 // ============================================================
 const VIDEO_BASE_URL = 'http://10.91.187.95:8080';
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyvhI5R-C872idGfhfGkHoAD4zpZmw3rukZJSl-LRMyWYMS7W8wE_UJ7ClCWHaY6xw/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxqEFJ6YJFI_VegExt_vBPs0TFzyFnA4yB1BabDaj_6Pohlp8X7zghFk2-lmq-RQsSc/exec';
 
 // ============================================================
 // State
