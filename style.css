@@ -309,4 +309,35 @@ body {
   font-size: 17px; font-weight: 600; border-radius: 10px;
   text-align: center; letter-spacing: 0.3px;
 }
+.btn-sm { padding: 6px 14px; font-size: 13px; }
+.instr-dashboard-link {
+  text-align: center; margin-top: 14px;
+}
+.instr-dashboard-link a {
+  color: #888; font-size: 13px; text-decoration: none;
+}
+.instr-dashboard-link a:hover { color: #4a90d9; text-decoration: underline; }
+
+/* Rating toast */
+.rating-toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: #27ae60; color: #fff; padding: 12px 28px;
+  border-radius: 8px; font-size: 15px; font-weight: 600;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.rating-toast.show { opacity: 1; }
+
+/* Player action bar */
+.player-actions {
+  display: flex; gap: 12px; justify-content: center; align-items: center;
+  margin-top: 4px;
+}
+.player-actions .btn { min-width: 160px; }
+.btn-outline-skip {
+  padding: 8px 18px; border: 2px solid #ddd; border-radius: 6px;
+  background: #fff; color: #666; cursor: pointer; font-size: 14px;
+  transition: all 0.15s;
+}
+.btn-outline-skip:hover { border-color: #4a90d9; color: #4a90d9; }
 

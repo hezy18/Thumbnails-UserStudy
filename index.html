@@ -97,9 +97,12 @@
           </div>
         </div>
 
-        <button class="btn btn-primary btn-enter" onclick="showView('view-dashboard')">
+        <button class="btn btn-primary btn-enter" onclick="enterExperiment()">
           Confirm &amp; Enter &nbsp;/&nbsp; 确认进入
         </button>
+        <div class="instr-dashboard-link">
+          <a href="#" onclick="showView('view-dashboard');return false;">Go to Dashboard / Module B →</a>
+        </div>
       </div>
     </div>
   </div>
@@ -150,7 +153,9 @@
       </div>
       <div class="header-right">
         <span id="a-progress"></span>
-        <button class="btn btn-secondary" onclick="showView('view-dashboard')">Back / 返回</button>
+        <button id="btn-finish-a" class="btn btn-finish" onclick="finishStudy()" disabled>Finish A</button>
+        <button class="btn btn-success btn-sm" onclick="exportData()">Export</button>
+        <button class="btn btn-secondary" onclick="showView('view-dashboard')">Dashboard</button>
       </div>
     </div>
     <div class="content">
@@ -166,11 +171,11 @@
   <div id="view-player-a" class="view">
     <div class="header">
       <div class="header-left">
-        <button class="btn btn-outline-instr" onclick="showView('view-instructions')">&#128203; Instructions / 说明</button>
         <h2 id="player-a-title">Video Rating</h2>
       </div>
       <div class="header-right">
-        <button class="btn btn-secondary" onclick="showView('view-module-a')">Back to List / 返回列表</button>
+        <span id="a-progress-player"></span>
+        <button class="btn btn-secondary" onclick="backToGridA()">← Grid / 返回列表</button>
       </div>
     </div>
     <div class="content">
@@ -209,7 +214,10 @@
             <div class="likert-circle"></div>
           </div>
         </div>
-        <button class="btn btn-primary" onclick="submitRatingA()">Submit Rating / 提交评分</button>
+        <div class="player-actions">
+          <button class="btn btn-outline-skip" onclick="openNextUnratedA()">Skip / 跳过 →</button>
+          <button class="btn btn-primary" id="btn-submit-rating" onclick="submitRatingA()">Submit Rating / 提交评分</button>
+        </div>
       </div>
     </div>
   </div>
@@ -284,6 +292,7 @@
     </div>
   </div>
 
+  <div id="rating-toast" class="rating-toast"></div>
   <script src="app.js"></script>
 </body>
 </html>

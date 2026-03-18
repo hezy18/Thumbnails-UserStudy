@@ -83,7 +83,12 @@ window.addEventListener('DOMContentLoaded', async () => {
       userLang = savedLang;
       currentLangA = savedLang === 'ZH' ? 'ZH' : 'EN';
       instrLang = savedLang === 'ZH' ? 'zh' : 'en';
-      showView('view-instructions');
+      // Skip instructions on return visits — go straight to Module A
+      if (localStorage.getItem('instrSeen')) {
+        showView('view-module-a');
+      } else {
+        showView('view-instructions');
+      }
     } else {
       showView('view-lang-select');
     }
@@ -162,11 +167,19 @@ function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 
+  // Stop any playing videos when leaving player views
+  document.querySelectorAll('video').forEach(v => {
+    if (!document.getElementById(id).contains(v)) {
+      v.pause();
+    }
+  });
+
   // Hooks when entering views
   if (id === 'view-instructions') switchInstrLang(instrLang);
   if (id === 'view-dashboard') updateFinishBtn();
-  if (id === 'view-module-a') renderModuleA();
+  if (id === 'view-module-a') { renderModuleA(); updateModuleAFinishBtn(); }
   if (id === 'view-module-b') renderModuleB();
+  if (id === 'view-player-a') updatePlayerProgress();
 }
 
 // ============================================================
@@ -197,6 +210,7 @@ function doLogout() {
   instrLang = 'en';
   localStorage.removeItem('currentUser');
   localStorage.removeItem('userLang');
+  localStorage.removeItem('instrSeen');
   document.getElementById('input-uid').value = '';
   document.getElementById('input-pwd').value = '';
   showView('view-login');
@@ -343,6 +357,88 @@ function submitRatingA() {
     watch_ratio: watchRatio,
     timestamp: new Date().toISOString()
   });
+
+  // Show toast and auto-advance to next unrated video
+  showRatingToast();
+  updatePlayerProgress();
+  const nextVid = getNextUnratedVideo();
+  if (nextVid) {
+    setTimeout(() => openPlayerA(nextVid), 900);
+  } else {
+    setTimeout(() => showView('view-module-a'), 900);
+  }
+}
+
+// ============================================================
+// Module A helpers — seamless navigation
+// ============================================================
+function getNextUnratedVideo() {
+  const vids = videoListA[currentLangA];
+  const prefs = getPreferences().filter(p => p.user_id === currentUser && p.language === currentLangA);
+  const ratedSet = new Set(prefs.map(p => p.video_id));
+  const currentIdx = vids.indexOf(currentVideoA);
+  for (let i = 1; i < vids.length; i++) {
+    const idx = (currentIdx + i) % vids.length;
+    if (!ratedSet.has(vids[idx])) return vids[idx];
+  }
+  return null;
+}
+
+function openNextUnratedA() {
+  const nextVid = getNextUnratedVideo();
+  if (nextVid) {
+    openPlayerA(nextVid);
+  } else {
+    showView('view-module-a');
+  }
+}
+
+function backToGridA() {
+  const videoEl = document.getElementById('video-a');
+  videoEl.pause();
+  videoEl.ontimeupdate = null;
+  videoEl.onseeking = null;
+  showView('view-module-a');
+}
+
+function showRatingToast() {
+  const toast = document.getElementById('rating-toast');
+  toast.textContent = '✓ Rating Saved / 评分已保存';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1200);
+}
+
+function updatePlayerProgress() {
+  const prefs = getPreferences().filter(p => p.user_id === currentUser && p.language === currentLangA);
+  const count = prefs.length;
+  let text;
+  if (userLang === 'EN') {
+    text = currentLangA === 'EN' ? `${count}/20` : `${count} (optional)`;
+  } else {
+    text = `${count}/15`;
+  }
+  const el = document.getElementById('a-progress-player');
+  if (el) el.textContent = text;
+}
+
+function updateModuleAFinishBtn() {
+  const allPrefs = getPreferences().filter(p => p.user_id === currentUser);
+  const zhRated = allPrefs.filter(p => p.language === 'ZH').length;
+  const enRated = allPrefs.filter(p => p.language === 'EN').length;
+  let ready, label;
+  if (userLang === 'EN') {
+    ready = enRated >= 20;
+    label = ready ? 'Finish A ✓' : `Finish A (${enRated}/20)`;
+  } else {
+    ready = zhRated >= 10 && enRated >= 10;
+    label = ready ? 'Finish A ✓' : `Finish A (V${zhRated} H${enRated})`;
+  }
+  const btn = document.getElementById('btn-finish-a');
+  if (btn) { btn.disabled = !ready; btn.textContent = label; }
+}
+
+function enterExperiment() {
+  localStorage.setItem('instrSeen', '1');
   showView('view-module-a');
 }
 
