@@ -1,7 +1,7 @@
 // ============================================================
 // Config — update VIDEO_BASE_URL to wherever your videos are hosted
 // ============================================================
-const VIDEO_BASE_URL = 'http://10.91.187.95:8080';
+const VIDEO_BASE_URL = 'https://pub-4740265da8d444f58e0cfbce5100463d.r2.dev';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxqEFJ6YJFI_VegExt_vBPs0TFzyFnA4yB1BabDaj_6Pohlp8X7zghFk2-lmq-RQsSc/exec';
 
 // ============================================================
@@ -224,7 +224,7 @@ function renderModuleA() {
     img.alt = `Video ${displayNum}`;
     // Try pre-generated thumbnail first; on error, fall back to canvas capture
     const thumbSrc = `thumbnail/a-${currentLangA}/${vid}.jpg`;
-    const videoSrc = `${VIDEO_BASE_URL}/videos/a-${currentLangA}/${vid}.mp4`;
+    const videoSrc = `${VIDEO_BASE_URL}/a-${currentLangA}/${vid}.mp4`;
     img.src = thumbSrc;
     img.onerror = () => {
       img.onerror = null; // prevent loop
@@ -249,7 +249,7 @@ function openPlayerA(vid) {
   document.getElementById('player-a-title').textContent = `[${currentLangA}] ${vid}`;
 
   const videoEl = document.getElementById('video-a');
-  videoEl.querySelector('source').src = `${VIDEO_BASE_URL}/videos/a-${currentLangA}/${vid}.mp4`;
+  videoEl.querySelector('source').src = `${VIDEO_BASE_URL}/a-${currentLangA}/${vid}.mp4`;
   videoEl.load();
 
   // Track the furthest position the user has watched
