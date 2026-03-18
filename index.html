@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Experiment Platform</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- LOGIN VIEW -->
+  <div id="view-login" class="view active">
+    <div class="login-container">
+      <div class="login-box">
+        <h1>Video Experiment</h1>
+        <div id="login-error" class="login-error" style="display:none"></div>
+        <input type="text" id="input-uid" placeholder="User ID">
+        <input type="password" id="input-pwd" placeholder="Password">
+        <button onclick="doLogin()">Login</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="view-dashboard" class="view">
+    <div class="header">
+      <h2>Dashboard</h2>
+      <div class="header-right">
+        <span id="user-label"></span>
+        <button class="btn btn-secondary" onclick="doLogout()">Logout</button>
+        <button class="btn btn-success" onclick="exportData()">Export Data</button>
+        <button id="btn-finish" class="btn btn-finish" onclick="finishStudy()" disabled>Finish A (0% / 30% required)</button>
+      </div>
+    </div>
+    <div class="dashboard">
+      <h1>Choose a Module</h1>
+      <div class="module-cards">
+        <div class="module-card" onclick="showView('view-module-a')">
+          <h3>Module A</h3>
+          <p>User Preference Collection<br><br>Browse 100 videos, watch and rate each one on a 1–5 star scale.</p>
+        </div>
+        <div class="module-card" onclick="showView('view-module-b')">
+          <h3>Module B</h3>
+          <p>Thumbnail Comparison Experiment<br><br>Pick from 6 thumbnail options, watch the video, and fill out a short questionnaire.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE A: Video List -->
+  <div id="view-module-a" class="view">
+    <div class="header">
+      <h2>Module A — Preference Collection</h2>
+      <div class="header-right">
+        <span id="a-progress"></span>
+        <button class="btn btn-secondary" onclick="showView('view-dashboard')">Back</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="lang-tabs">
+        <button class="lang-tab active" data-lang="CH" onclick="switchLangA('CH')">CH</button>
+        <button class="lang-tab" data-lang="EN" onclick="switchLangA('EN')">EN</button>
+      </div>
+      <div id="grid-a" class="video-grid"></div>
+    </div>
+  </div>
+
+  <!-- MODULE A: Player + Rating -->
+  <div id="view-player-a" class="view">
+    <div class="header">
+      <h2 id="player-a-title">Video</h2>
+      <div class="header-right">
+        <button class="btn btn-secondary" onclick="showView('view-module-a')">Back to List</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="player-section">
+        <video id="video-a" controls>
+          <source src="" type="video/mp4">
+        </video>
+        <div class="likert-question">
+          <span class="likert-q-en">How well does this video match your interests?</span>
+          <span class="likert-q-cn">这个视频有多符合你的兴趣？</span>
+        </div>
+        <div class="likert-scale">
+          <div class="likert-col" data-val="1">
+            <div class="likert-en">Not interested<br>at all</div>
+            <div class="likert-cn">非常不感兴趣</div>
+            <div class="likert-circle"></div>
+          </div>
+          <div class="likert-col" data-val="2">
+            <div class="likert-en">Somewhat<br>uninterested</div>
+            <div class="likert-cn">比较不感兴趣</div>
+            <div class="likert-circle"></div>
+          </div>
+          <div class="likert-col" data-val="3">
+            <div class="likert-en">Neutral</div>
+            <div class="likert-cn">一般</div>
+            <div class="likert-circle"></div>
+          </div>
+          <div class="likert-col" data-val="4">
+            <div class="likert-en">Somewhat<br>interested</div>
+            <div class="likert-cn">比较感兴趣</div>
+            <div class="likert-circle"></div>
+          </div>
+          <div class="likert-col" data-val="5">
+            <div class="likert-en">Very<br>interested</div>
+            <div class="likert-cn">非常感兴趣</div>
+            <div class="likert-circle"></div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="submitRatingA()">Submit Rating</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE B: Task List -->
+  <div id="view-module-b" class="view">
+    <div class="header">
+      <h2>Module B — Thumbnail Experiment</h2>
+      <div class="header-right">
+        <span id="b-progress"></span>
+        <button class="btn btn-secondary" onclick="showView('view-dashboard')">Back</button>
+      </div>
+    </div>
+    <div class="content">
+      <div id="task-list-b" class="task-list"></div>
+    </div>
+  </div>
+
+  <!-- MODULE B: Thumbnail Selection -->
+  <div id="view-thumb-select" class="view">
+    <div class="header">
+      <h2 id="thumb-title">Choose a Thumbnail</h2>
+      <div class="header-right">
+        <button class="btn btn-secondary" onclick="showView('view-module-b')">Back</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="thumb-selection">
+        <h3>Click the thumbnail you prefer to start watching</h3>
+        <div id="thumb-grid" class="thumb-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE B: Video + Questionnaire -->
+  <div id="view-player-b" class="view">
+    <div class="header">
+      <h2 id="player-b-title">Video</h2>
+      <div class="header-right">
+        <button class="btn btn-secondary" onclick="showView('view-module-b')">Back</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="player-section">
+        <video id="video-b" controls>
+          <source src="" type="video/mp4">
+        </video>
+      </div>
+      <div class="questionnaire">
+        <h3>Post-Viewing Questionnaire</h3>
+        <div class="q-item">
+          <label>1. Cover visual quality (1–5)</label>
+          <div id="stars-b-quality" class="star-rating"></div>
+        </div>
+        <div class="q-item">
+          <label>2. Cover relevance to video content (1–5)</label>
+          <div id="stars-b-relevance" class="star-rating"></div>
+        </div>
+        <div class="q-item">
+          <label>3. Video content preference (1–5)</label>
+          <div id="stars-b-preference" class="star-rating"></div>
+        </div>
+        <button class="btn btn-primary" onclick="submitQuestionnaireB()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

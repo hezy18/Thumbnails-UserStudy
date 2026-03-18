@@ -1,0 +1,467 @@
+// ============================================================
+// Config — update VIDEO_BASE_URL to wherever your videos are hosted
+// ============================================================
+const VIDEO_BASE_URL = 'http://10.91.187.95:8080';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyvhI5R-C872idGfhfGkHoAD4zpZmw3rukZJSl-LRMyWYMS7W8wE_UJ7ClCWHaY6xw/exec';
+
+// ============================================================
+// State
+// ============================================================
+let currentUser = null;        // logged-in user id
+let users = [];                // [{id, password}]
+let assignments = {};          // {userId: [videoId, ...]}
+let ratingA = 0;               // temp star value for module A
+let currentVideoA = null;      // video id being rated
+let currentLangA = 'CH';       // selected language for Module A ('CH' or 'EN')
+let videoListA = { CH: [], EN: [] }; // filenames loaded from manifest
+let watchMaxPos = 0;           // furthest playback position reached (seconds)
+let currentVideoB = null;      // video id in module B
+let selectedThumb = null;      // chosen thumbnail (1-6)
+let ratingsB = { quality: 0, relevance: 0, preference: 0 };
+
+// ============================================================
+// Thumbnail capture queue (sequential canvas capture fallback)
+// ============================================================
+const thumbQueue = [];
+let thumbCapturing = false;
+
+function requestThumbnail(imgEl, videoSrc) {
+  thumbQueue.push({ imgEl, videoSrc });
+  if (!thumbCapturing) processThumbQueue();
+}
+
+function processThumbQueue() {
+  if (thumbQueue.length === 0) { thumbCapturing = false; return; }
+  thumbCapturing = true;
+  const { imgEl, videoSrc } = thumbQueue.shift();
+
+  const vid = document.createElement('video');
+  vid.preload = 'metadata';
+  vid.muted = true;
+  vid.playsInline = true;
+  vid.crossOrigin = 'anonymous';
+  vid.src = videoSrc;
+
+  const cleanup = () => { vid.src = ''; processThumbQueue(); };
+
+  vid.addEventListener('loadedmetadata', () => { vid.currentTime = 0.5; });
+  vid.addEventListener('seeked', () => {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = vid.videoWidth || 320;
+      canvas.height = vid.videoHeight || 180;
+      canvas.getContext('2d').drawImage(vid, 0, 0);
+      imgEl.src = canvas.toDataURL('image/jpeg', 0.75);
+    } catch (e) { /* cross-origin or decode error — leave placeholder */ }
+    cleanup();
+  });
+  vid.addEventListener('error', cleanup);
+  // Timeout safety: skip after 8s
+  setTimeout(cleanup, 8000);
+}
+
+// Persisted in localStorage
+// "preferences"   -> [{user_id, language, video_id, rating, watch_max_pos, video_duration, watch_ratio, timestamp}]
+// "responses"     -> [{user_id, video_id, selected_thumbnail, score_quality, score_relevance, score_preference, timestamp}]
+
+// ============================================================
+// Boot
+// ============================================================
+window.addEventListener('DOMContentLoaded', async () => {
+  await Promise.all([loadUsers(), loadAssignments(), loadVideoListA()]);
+  // Check if already logged in
+  const saved = localStorage.getItem('currentUser');
+  if (saved) {
+    currentUser = saved;
+    document.getElementById('user-label').textContent = currentUser;
+    showView('view-dashboard');
+  }
+});
+
+// ============================================================
+// Data loading (txt files)
+// ============================================================
+async function loadUsers() {
+  try {
+    const res = await fetch('data/users.txt');
+    const text = await res.text();
+    users = text.trim().split('\n').filter(Boolean).map(line => {
+      const [id, password] = line.split(',');
+      return { id: id.trim(), password: password.trim() };
+    });
+  } catch (e) {
+    console.error('Failed to load users.txt', e);
+  }
+}
+
+async function loadVideoListA() {
+  for (const lang of ['CH', 'EN']) {
+    try {
+      const res = await fetch(`data/videos-a-${lang}.txt`);
+      const text = await res.text();
+      videoListA[lang] = text.trim().split('\n').filter(Boolean).map(l => l.trim());
+    } catch (e) {
+      console.error(`Failed to load videos-a-${lang}.txt`, e);
+    }
+  }
+}
+
+async function loadAssignments() {
+  try {
+    const res = await fetch('data/assignments.txt');
+    const text = await res.text();
+    text.trim().split('\n').filter(Boolean).forEach(line => {
+      const [uid, vids] = line.split(':');
+      assignments[uid.trim()] = vids.split(',').map(v => v.trim());
+    });
+  } catch (e) {
+    console.error('Failed to load assignments.txt', e);
+  }
+}
+
+// ============================================================
+// LocalStorage helpers
+// ============================================================
+function getPreferences() {
+  return JSON.parse(localStorage.getItem('preferences') || '[]');
+}
+function savePreference(entry) {
+  const prefs = getPreferences();
+  // Replace if same user+language+video already rated
+  const idx = prefs.findIndex(p => p.user_id === entry.user_id && p.language === entry.language && p.video_id === entry.video_id);
+  if (idx >= 0) prefs[idx] = entry; else prefs.push(entry);
+  localStorage.setItem('preferences', JSON.stringify(prefs));
+}
+
+function getResponses() {
+  return JSON.parse(localStorage.getItem('responses') || '[]');
+}
+function saveResponse(entry) {
+  const resp = getResponses();
+  const idx = resp.findIndex(r => r.user_id === entry.user_id && r.video_id === entry.video_id);
+  if (idx >= 0) resp[idx] = entry; else resp.push(entry);
+  localStorage.setItem('responses', JSON.stringify(resp));
+}
+
+// ============================================================
+// View management
+// ============================================================
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  // Hooks when entering views
+  if (id === 'view-dashboard') updateFinishBtn();
+  if (id === 'view-module-a') renderModuleA();
+  if (id === 'view-module-b') renderModuleB();
+}
+
+// ============================================================
+// Login / Logout
+// ============================================================
+function doLogin() {
+  const uid = document.getElementById('input-uid').value.trim();
+  const pwd = document.getElementById('input-pwd').value.trim();
+  const errEl = document.getElementById('login-error');
+
+  const user = users.find(u => u.id === uid && u.password === pwd);
+  if (!user) {
+    errEl.textContent = 'Invalid User ID or Password';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  currentUser = uid;
+  localStorage.setItem('currentUser', uid);
+  document.getElementById('user-label').textContent = uid;
+  showView('view-dashboard');
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('currentUser');
+  document.getElementById('input-uid').value = '';
+  document.getElementById('input-pwd').value = '';
+  showView('view-login');
+}
+
+// ============================================================
+// Module A
+// ============================================================
+function switchLangA(lang) {
+  currentLangA = lang;
+  document.querySelectorAll('.lang-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.lang === lang);
+  });
+  renderModuleA();
+}
+
+function renderModuleA() {
+  const grid = document.getElementById('grid-a');
+  grid.innerHTML = '';
+
+  // Sync tab highlight (handles re-entry from dashboard)
+  document.querySelectorAll('.lang-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.lang === currentLangA);
+  });
+
+  const vids = videoListA[currentLangA];
+  const prefs = getPreferences().filter(p => p.user_id === currentUser && p.language === currentLangA);
+  const ratedSet = new Set(prefs.map(p => p.video_id));
+
+  const count = vids.length;
+  const ratedCount = prefs.length;
+  document.getElementById('a-progress').textContent = `${currentLangA}: ${ratedCount} / ${count} rated`;
+
+  vids.forEach((vid, idx) => {
+    const displayNum = String(idx + 1).padStart(2, '0');
+    const rated = ratedSet.has(vid);
+    const card = document.createElement('div');
+    card.className = 'video-card' + (rated ? ' rated' : '');
+
+    const img = document.createElement('img');
+    img.className = 'card-thumb';
+    img.alt = `Video ${displayNum}`;
+    // Try pre-generated thumbnail first; on error, fall back to canvas capture
+    const thumbSrc = `thumbnail/a-${currentLangA}/${vid}.jpg`;
+    const videoSrc = `${VIDEO_BASE_URL}/videos/a-${currentLangA}/${vid}.mp4`;
+    img.src = thumbSrc;
+    img.onerror = () => {
+      img.onerror = null; // prevent loop
+      requestThumbnail(img, videoSrc);
+    };
+
+    const label = document.createElement('div');
+    label.className = 'card-label';
+    label.textContent = rated ? 'Rated ✓' : `Video ${displayNum}`;
+
+    card.appendChild(img);
+    card.appendChild(label);
+    card.onclick = () => openPlayerA(vid);
+    grid.appendChild(card);
+  });
+}
+
+function openPlayerA(vid) {
+  currentVideoA = vid;
+  ratingA = 0;
+  watchMaxPos = 0;
+  document.getElementById('player-a-title').textContent = `[${currentLangA}] ${vid}`;
+
+  const videoEl = document.getElementById('video-a');
+  videoEl.querySelector('source').src = `${VIDEO_BASE_URL}/videos/a-${currentLangA}/${vid}.mp4`;
+  videoEl.load();
+
+  // Track the furthest position the user has watched
+  videoEl.ontimeupdate = () => {
+    if (videoEl.currentTime > watchMaxPos) watchMaxPos = videoEl.currentTime;
+  };
+
+  // Wire up Likert columns as the clickable rating UI
+  document.querySelectorAll('.likert-col').forEach(col => {
+    col.classList.remove('selected');
+    col.onclick = () => {
+      ratingA = parseInt(col.dataset.val);
+      document.querySelectorAll('.likert-col').forEach(c => c.classList.remove('selected'));
+      col.classList.add('selected');
+    };
+  });
+
+  showView('view-player-a');
+}
+
+function submitRatingA() {
+  if (ratingA === 0) { alert('Please select a rating.'); return; }
+  const videoEl = document.getElementById('video-a');
+  const duration = videoEl.duration || 0;
+  const watchRatio = duration > 0 ? parseFloat((watchMaxPos / duration).toFixed(3)) : 0;
+  videoEl.ontimeupdate = null; // stop tracking
+
+  savePreference({
+    user_id: currentUser,
+    language: currentLangA,
+    video_id: currentVideoA,
+    rating: ratingA,
+    watch_max_pos: parseFloat(watchMaxPos.toFixed(2)),
+    video_duration: parseFloat(duration.toFixed(2)),
+    watch_ratio: watchRatio,
+    timestamp: new Date().toISOString()
+  });
+  showView('view-module-a');
+}
+
+// ============================================================
+// Finish button (active at >= 30% completion across CH + EN)
+// ============================================================
+function updateFinishBtn() {
+  const totalVideos = videoListA.CH.length + videoListA.EN.length;
+  if (totalVideos === 0) return;
+  const rated = getPreferences().filter(p => p.user_id === currentUser).length;
+  const pct = Math.round((rated / totalVideos) * 100);
+  const btn = document.getElementById('btn-finish');
+  const ready = rated / totalVideos >= 0.3;
+  btn.disabled = !ready;
+  btn.textContent = ready ? `Finish A (${pct}% done)` : `Finish A (${pct}% / 30% required)`;
+}
+
+function finishStudy() {
+  const totalVideos = videoListA.CH.length + videoListA.EN.length;
+  const rated = getPreferences().filter(p => p.user_id === currentUser).length;
+  if (!confirm(`You have rated ${rated} / ${totalVideos} videos.\nYour data will be saved automatically. Continue?`)) return;
+
+  const data = getPreferences().filter(p => p.user_id === currentUser);
+  const btn = document.getElementById('btn-finish');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  fetch(SHEETS_URL, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  })
+    .then(() => {
+      btn.textContent = 'Saved ✓';
+      exportData(); // also download local backup
+      alert('Your data has been saved. Thank you!');
+    })
+    .catch(() => {
+      btn.disabled = false;
+      updateFinishBtn();
+      alert('Network error — please use "Export Data" as a backup and send the file to the researcher.');
+    });
+}
+
+// ============================================================
+// Module B
+// ============================================================
+function renderModuleB() {
+  const list = document.getElementById('task-list-b');
+  list.innerHTML = '';
+
+  const vids = assignments[currentUser] || [];
+  if (vids.length === 0) {
+    list.innerHTML = '<p style="text-align:center;color:#999;padding:40px">No videos assigned to this user. Check data/assignments.txt.</p>';
+    return;
+  }
+
+  const responses = getResponses().filter(r => r.user_id === currentUser);
+  const doneSet = new Set(responses.map(r => r.video_id));
+  const doneCount = vids.filter(v => doneSet.has(v)).length;
+  document.getElementById('b-progress').textContent = `${doneCount} / ${vids.length} completed`;
+
+  vids.forEach(vid => {
+    const done = doneSet.has(vid);
+    const item = document.createElement('div');
+    item.className = 'task-item' + (done ? ' completed' : '');
+    item.innerHTML = `
+      <span class="task-label">Video ${vid}</span>
+      <span class="task-status ${done ? 'done' : 'pending'}">${done ? 'Completed' : 'Pending'}</span>
+    `;
+    if (!done) item.onclick = () => openThumbSelect(vid);
+    list.appendChild(item);
+  });
+}
+
+function openThumbSelect(vid) {
+  currentVideoB = vid;
+  selectedThumb = null;
+  document.getElementById('thumb-title').textContent = 'Video ' + vid + ' — Choose a Thumbnail';
+
+  const grid = document.getElementById('thumb-grid');
+  grid.innerHTML = '';
+
+  for (let i = 1; i <= 6; i++) {
+    const opt = document.createElement('div');
+    opt.className = 'thumb-option';
+    opt.innerHTML = `
+      <span class="option-label">Option ${i}</span>
+      <div class="placeholder-thumb">Thumb ${vid}-${i}</div>
+    `;
+    opt.onclick = () => selectThumbnail(vid, i);
+    grid.appendChild(opt);
+  }
+
+  showView('view-thumb-select');
+}
+
+function selectThumbnail(vid, thumbIdx) {
+  selectedThumb = thumbIdx;
+  document.getElementById('player-b-title').textContent = 'Video ' + vid + ' (Thumbnail ' + thumbIdx + ')';
+
+  const videoEl = document.getElementById('video-b');
+  videoEl.querySelector('source').src = `videos/b/video_${vid}.mp4`;
+  videoEl.load();
+
+  // Reset questionnaire stars
+  ratingsB = { quality: 0, relevance: 0, preference: 0 };
+  buildStars('stars-b-quality', val => { ratingsB.quality = val; });
+  buildStars('stars-b-relevance', val => { ratingsB.relevance = val; });
+  buildStars('stars-b-preference', val => { ratingsB.preference = val; });
+
+  showView('view-player-b');
+}
+
+function submitQuestionnaireB() {
+  if (ratingsB.quality === 0 || ratingsB.relevance === 0 || ratingsB.preference === 0) {
+    alert('Please fill in all three ratings.');
+    return;
+  }
+  saveResponse({
+    user_id: currentUser,
+    video_id: currentVideoB,
+    selected_thumbnail: selectedThumb,
+    score_quality: ratingsB.quality,
+    score_relevance: ratingsB.relevance,
+    score_preference: ratingsB.preference,
+    timestamp: new Date().toISOString()
+  });
+  showView('view-module-b');
+}
+
+// ============================================================
+// Star rating component
+// ============================================================
+function buildStars(containerId, onChange) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  let current = 0;
+  for (let i = 1; i <= 5; i++) {
+    const star = document.createElement('span');
+    star.className = 'star';
+    star.textContent = '\u2605';
+    star.onclick = () => {
+      current = i;
+      onChange(i);
+      container.querySelectorAll('.star').forEach((s, idx) => {
+        s.classList.toggle('active', idx < i);
+      });
+    };
+    container.appendChild(star);
+  }
+}
+
+// ============================================================
+// Export data as downloadable txt
+// ============================================================
+function exportData() {
+  const prefs = getPreferences();
+  const resps = getResponses();
+
+  let text = '=== USER PREFERENCES (Module A) ===\n';
+  text += 'user_id\tlanguage\tvideo_id\trating\twatch_max_pos\tvideo_duration\twatch_ratio\ttimestamp\n';
+  prefs.forEach(p => {
+    text += `${p.user_id}\t${p.language || ''}\t${p.video_id}\t${p.rating}\t${p.watch_max_pos ?? ''}\t${p.video_duration ?? ''}\t${p.watch_ratio ?? ''}\t${p.timestamp}\n`;
+  });
+
+  text += '\n=== EXPERIMENT RESPONSES (Module B) ===\n';
+  text += 'user_id\tvideo_id\tselected_thumbnail\tscore_quality\tscore_relevance\tscore_preference\ttimestamp\n';
+  resps.forEach(r => {
+    text += `${r.user_id}\t${r.video_id}\t${r.selected_thumbnail}\t${r.score_quality}\t${r.score_relevance}\t${r.score_preference}\t${r.timestamp}\n`;
+  });
+
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `experiment_data_${new Date().toISOString().slice(0, 10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
