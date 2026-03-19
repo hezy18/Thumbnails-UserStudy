@@ -165,6 +165,7 @@
         <button id="btn-cover-toggle" class="btn btn-cover-toggle" onclick="toggleCoverLayout()" style="display:none">Cover: 16:9 / <strong>9:16</strong></button>
       </div>
       <div id="grid-a" class="video-grid"></div>
+      <p class="survey-shortcut"><a href="#" onclick="openSurvey();return false" id="survey-shortcut-link"></a></p>
     </div>
   </div>
 
@@ -286,6 +287,82 @@
           <div id="stars-b-preference" class="star-rating"></div>
         </div>
         <button class="btn btn-primary" onclick="submitQuestionnaireB()">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SURVEY MODAL -->
+  <div id="survey-overlay" class="survey-overlay" style="display:none">
+    <div class="survey-modal">
+      <div id="survey-form">
+        <h2 id="survey-title"></h2>
+        <p id="survey-intro" class="survey-intro"></p>
+
+        <!-- Q1 Multiple Choice -->
+        <div class="survey-q">
+          <p class="survey-q-label" id="sq1-label"></p>
+          <label class="survey-opt"><input type="checkbox" name="sq1" value="minimalist"><span id="sq1-a"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq1" value="high_info"><span id="sq1-b"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq1" value="high_saturation"><span id="sq1-c"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq1" value="natural"><span id="sq1-d"></span></label>
+        </div>
+
+        <!-- Q2 Single Choice -->
+        <div class="survey-q">
+          <p class="survey-q-label" id="sq2-label"></p>
+          <label class="survey-opt"><input type="radio" name="sq2" value="very_important"><span id="sq2-a"></span></label>
+          <label class="survey-opt"><input type="radio" name="sq2" value="somewhat_important"><span id="sq2-b"></span></label>
+          <label class="survey-opt"><input type="radio" name="sq2" value="neutral"><span id="sq2-c"></span></label>
+          <label class="survey-opt"><input type="radio" name="sq2" value="unimportant"><span id="sq2-d"></span></label>
+        </div>
+
+        <!-- Q3 Multiple Choice (top 3) -->
+        <div class="survey-q">
+          <p class="survey-q-label" id="sq3-label"></p>
+          <label class="survey-opt"><input type="checkbox" name="sq3" value="expressions"><span id="sq3-a"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq3" value="action"><span id="sq3-b"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq3" value="objects"><span id="sq3-c"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq3" value="comparison"><span id="sq3-d"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq3" value="aesthetic"><span id="sq3-e"></span></label>
+        </div>
+
+        <!-- Q4 Single Choice -->
+        <div class="survey-q">
+          <p class="survey-q-label" id="sq4-label"></p>
+          <label class="survey-opt"><input type="radio" name="sq4" value="closeup"><span id="sq4-a"></span></label>
+          <label class="survey-opt"><input type="radio" name="sq4" value="wide_shot"><span id="sq4-b"></span></label>
+          <label class="survey-opt"><input type="radio" name="sq4" value="text_abstract"><span id="sq4-c"></span></label>
+        </div>
+
+        <!-- Q5 Short Answer -->
+        <div class="survey-q">
+          <p class="survey-q-label" id="sq5-label"></p>
+          <p class="survey-hint" id="sq5-hint"></p>
+          <textarea id="sq5-answer" class="survey-textarea" rows="3"></textarea>
+        </div>
+
+        <!-- Q6 Multiple Choice -->
+        <div class="survey-q">
+          <p class="survey-q-label" id="sq6-label"></p>
+          <label class="survey-opt"><input type="checkbox" name="sq6" value="clickbait"><span id="sq6-a"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq6" value="blurry"><span id="sq6-b"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq6" value="cluttered"><span id="sq6-c"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq6" value="misleading"><span id="sq6-d"></span></label>
+        </div>
+
+        <div class="survey-actions">
+          <button class="btn btn-primary btn-survey-submit" onclick="submitSurvey()">Submit Survey / 提交问卷</button>
+          <button class="btn btn-secondary" onclick="closeSurvey()">Cancel / 取消</button>
+        </div>
+      </div>
+      <div id="survey-success" style="display:none">
+        <div class="survey-success-msg">
+          <h2>Submission Successful!</h2>
+          <p>Thank you for your cooperation!</p>
+          <h2>提交成功！</h2>
+          <p>感谢您的配合！</p>
+          <button class="btn btn-primary" onclick="closeSurvey()" style="margin-top:24px">Close / 关闭</button>
+        </div>
       </div>
     </div>
   </div>

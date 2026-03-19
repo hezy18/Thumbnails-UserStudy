@@ -326,6 +326,13 @@ function renderModuleA() {
   }
   document.getElementById('a-progress').textContent = progressText;
 
+  // Update survey shortcut link text
+  const shortcutLink = document.getElementById('survey-shortcut-link');
+  if (shortcutLink) {
+    const st = SURVEY_TEXT[userLang] || SURVEY_TEXT.EN;
+    shortcutLink.textContent = st.shortcut;
+  }
+
   vids.forEach((vid, idx) => {
     const displayNum = String(idx + 1).padStart(2, '0');
     const rated = ratedSet.has(vid);
@@ -513,38 +520,194 @@ function updateFinishBtn() {
 }
 
 function finishStudy() {
-  const data = getPreferences().filter(p => p.user_id === currentUser);
-  const zhCount = data.filter(p => p.language === 'ZH').length;
-  const enCount = data.filter(p => p.language === 'EN').length;
-  if (!confirm(`Submit your ratings?\n\nVertical: ${zhCount} videos\nHorizontal: ${enCount} videos\n\nA backup file will also be downloaded.`)) return;
+  openSurvey();
+}
 
-  const btn = document.getElementById('btn-finish');
-  const status = document.getElementById('finish-status');
-  btn.disabled = true;
-  btn.textContent = 'Sending…';
-  status.textContent = '';
-  status.className = '';
+// ============================================================
+// Post-study survey
+// ============================================================
+const SURVEY_TEXT = {
+  EN: {
+    title: 'Post-Study Survey',
+    intro: 'Please answer the following questions. It should take less than 1 minute.',
+    q1: 'Q1. What visual style do you usually prefer when browsing video covers? (Multiple choice)',
+    q1a: 'Minimalist (clean composition, minimal text)',
+    q1b: 'High Information (rich elements, highlighted text)',
+    q1c: 'High Saturation & Contrast (vivid colors, strong visual impact)',
+    q1d: 'Natural & Documentary (real screenshots, no filters or effects)',
+    q2: 'Q2. How does text on a cover affect your desire to click? (Single choice)',
+    q2a: 'Very important — text directly determines whether I click',
+    q2b: 'Somewhat important — serves a supplementary role',
+    q2c: 'Neutral — I care more about the image',
+    q2d: 'Unimportant — text even blocks the image',
+    q3: 'Q3. Which elements most excite your desire to click? (Select up to 3)',
+    q3a: 'Human Expressions (e.g., surprise, laughter, crying)',
+    q3b: 'Action Moments (e.g., extreme sports, goals, crafting)',
+    q3c: 'Key Objects & Close-ups (e.g., appetizing food, new gadgets)',
+    q3d: 'Before & After Comparisons (e.g., success vs. failure)',
+    q3e: 'Aesthetic & Atmosphere (e.g., scenic shots, sunsets, filters)',
+    q4: 'Q4. What kind of main subject do you prefer on a cover? (Single choice)',
+    q4a: 'Close-up Portraits',
+    q4b: 'Wide Shots with Environment',
+    q4c: 'Pure Text or Abstract Graphics',
+    q5: 'Q5. Thinking back to the videos you rated highly, did their covers have anything in common? (Short answer)',
+    q5hint: 'e.g., Bold titles, bright colors, specific subjects, etc.',
+    q6: 'Q6. Which types of covers make you feel "repelled" or unlikely to click? (Multiple choice)',
+    q6a: 'Clickbait / Exaggerated Text',
+    q6b: 'Blurry / Low Quality',
+    q6c: 'Cluttered / Eyesore Colors',
+    q6d: 'Misleading Content',
+    shortcut: 'Already finished? Take the brief survey here',
+    alertMin: 'Please answer all required questions (Q1–Q4, Q6).',
+    alertQ3: 'Q3: Please select up to 3 items.'
+  },
+  ZH: {
+    title: '实验后简短调研',
+    intro: '请您回答以下问题，所需时间不超过1分钟。',
+    q1: '1. 在浏览视频封面时，您通常更偏好哪种视觉风格？（多选）',
+    q1a: '极简主义（构图干净，文字少）',
+    q1b: '高信息量（元素丰富，有重点文字标注）',
+    q1c: '高饱和/高对比度（色彩鲜艳，视觉冲击力强）',
+    q1d: '自然纪实（真实视频截图，不加滤镜或特效）',
+    q2: '2. 封面上出现的文字对您的吸引力影响如何？（单选）',
+    q2a: '非常重要，文字直接决定我是否点击',
+    q2b: '比较重要，起补充说明作用',
+    q2c: '一般，我更看重画面内容',
+    q2d: '不重要，甚至觉得文字会遮挡画面',
+    q3: '3. 以下哪些元素最能激发您的点击欲望？（请选择最相关的3项）',
+    q3a: '人物表情（如：惊讶、大笑、哭泣）',
+    q3b: '动作瞬间（如：极限运动、精彩进球、手工制作中）',
+    q3c: '关键物品/特写（如：诱人的食物、新款电子产品）',
+    q3d: '结果对比（如：Before & After、成功与失败的对比）',
+    q3e: '美感/氛围感（如：精美的空镜、落日、滤镜感）',
+    q4: '4. 您更倾向于看到什么样的封面主体？（单选）',
+    q4a: '清晰的人物大头贴/特写',
+    q4b: '远景或包含环境的大全景',
+    q4c: '纯文字说明或抽象图形',
+    q5: '5. 回想刚才您打高分的视频，它们的封面是否有共同点？（简答）',
+    q5hint: '例如：都有醒目的标题、配色都很明亮、都是小姐姐等',
+    q6: '6. 哪些封面会让您感到"反感"或绝对不会点击？（多选）',
+    q6a: '标题党/夸张文字',
+    q6b: '画面模糊/质量低下',
+    q6c: '色彩过于杂乱刺眼',
+    q6d: '内容与视频主题不符',
+    shortcut: '已完成？请点击此处填写简短调研',
+    alertMin: '请回答所有必填问题（Q1–Q4、Q6）。',
+    alertQ3: '第3题：请最多选择3项。'
+  }
+};
 
-  // Always download local backup immediately — data is never lost even if network fails
-  exportData();
+function populateSurveyText() {
+  const t = SURVEY_TEXT[userLang] || SURVEY_TEXT.EN;
+  document.getElementById('survey-title').textContent = t.title;
+  document.getElementById('survey-intro').textContent = t.intro;
+  document.getElementById('sq1-label').textContent = t.q1;
+  document.getElementById('sq1-a').textContent = t.q1a;
+  document.getElementById('sq1-b').textContent = t.q1b;
+  document.getElementById('sq1-c').textContent = t.q1c;
+  document.getElementById('sq1-d').textContent = t.q1d;
+  document.getElementById('sq2-label').textContent = t.q2;
+  document.getElementById('sq2-a').textContent = t.q2a;
+  document.getElementById('sq2-b').textContent = t.q2b;
+  document.getElementById('sq2-c').textContent = t.q2c;
+  document.getElementById('sq2-d').textContent = t.q2d;
+  document.getElementById('sq3-label').textContent = t.q3;
+  document.getElementById('sq3-a').textContent = t.q3a;
+  document.getElementById('sq3-b').textContent = t.q3b;
+  document.getElementById('sq3-c').textContent = t.q3c;
+  document.getElementById('sq3-d').textContent = t.q3d;
+  document.getElementById('sq3-e').textContent = t.q3e;
+  document.getElementById('sq4-label').textContent = t.q4;
+  document.getElementById('sq4-a').textContent = t.q4a;
+  document.getElementById('sq4-b').textContent = t.q4b;
+  document.getElementById('sq4-c').textContent = t.q4c;
+  document.getElementById('sq5-label').textContent = t.q5;
+  document.getElementById('sq5-hint').textContent = t.q5hint;
+  document.getElementById('sq6-label').textContent = t.q6;
+  document.getElementById('sq6-a').textContent = t.q6a;
+  document.getElementById('sq6-b').textContent = t.q6b;
+  document.getElementById('sq6-c').textContent = t.q6c;
+  document.getElementById('sq6-d').textContent = t.q6d;
+  // Shortcut link
+  const link = document.getElementById('survey-shortcut-link');
+  if (link) link.textContent = t.shortcut;
+}
 
-  // Google Apps Script requires no-cors + text/plain for cross-origin POST
+function openSurvey() {
+  populateSurveyText();
+  // Reset form
+  document.querySelectorAll('#survey-form input[type="checkbox"], #survey-form input[type="radio"]').forEach(i => i.checked = false);
+  document.getElementById('sq5-answer').value = '';
+  document.getElementById('survey-form').style.display = '';
+  document.getElementById('survey-success').style.display = 'none';
+  document.getElementById('survey-overlay').style.display = 'flex';
+}
+
+function closeSurvey() {
+  document.getElementById('survey-overlay').style.display = 'none';
+}
+
+function getCheckedValues(name) {
+  return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(i => i.value);
+}
+
+function submitSurvey() {
+  const t = SURVEY_TEXT[userLang] || SURVEY_TEXT.EN;
+  const q1 = getCheckedValues('sq1');
+  const q2 = getCheckedValues('sq2');
+  const q3 = getCheckedValues('sq3');
+  const q4 = getCheckedValues('sq4');
+  const q5 = document.getElementById('sq5-answer').value.trim();
+  const q6 = getCheckedValues('sq6');
+
+  // Validate required fields
+  if (q1.length === 0 || q2.length === 0 || q3.length === 0 || q4.length === 0 || q6.length === 0) {
+    alert(t.alertMin);
+    return;
+  }
+  if (q3.length > 3) {
+    alert(t.alertQ3);
+    return;
+  }
+
+  const surveyData = {
+    user_id: currentUser,
+    type: 'survey',
+    q1_visual_style: q1.join(', '),
+    q2_text_importance: q2[0],
+    q3_click_elements: q3.join(', '),
+    q4_subject_preference: q4[0],
+    q5_common_features: q5,
+    q6_repelling_covers: q6.join(', '),
+    timestamp: new Date().toISOString()
+  };
+
+  const preferences = getPreferences().filter(p => p.user_id === currentUser);
+  const payload = { preferences, survey: surveyData };
+
+  const submitBtn = document.querySelector('.btn-survey-submit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = userLang === 'ZH' ? '提交中…' : 'Submitting…';
+
   fetch(SHEETS_URL, {
     method: 'POST',
     mode: 'no-cors',
     headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(data)
+    body: JSON.stringify(payload)
   })
     .then(() => {
-      btn.textContent = 'Finish A ✓';
-      status.textContent = '✓ Sent successfully. Backup file also downloaded.';
-      status.className = 'finish-status-ok';
+      document.getElementById('survey-form').style.display = 'none';
+      document.getElementById('survey-success').style.display = '';
+      // Update finish buttons to reflect completion
+      const btnA = document.getElementById('btn-finish-a');
+      if (btnA) { btnA.textContent = 'Finish A ✓'; btnA.disabled = true; btnA.classList.remove('btn-finish-ready'); }
+      const btnD = document.getElementById('btn-finish');
+      if (btnD) { btnD.textContent = 'Finish A ✓'; btnD.disabled = true; btnD.classList.remove('btn-finish-ready'); }
     })
     .catch(() => {
-      btn.disabled = false;
-      updateFinishBtn();
-      status.textContent = '✗ Network error. Use "Export Data" and send the file manually.';
-      status.className = 'finish-status-err';
+      submitBtn.disabled = false;
+      submitBtn.textContent = userLang === 'ZH' ? '提交问卷' : 'Submit Survey';
+      alert(userLang === 'ZH' ? '网络错误，请重试。' : 'Network error. Please try again.');
     });
 }
 
