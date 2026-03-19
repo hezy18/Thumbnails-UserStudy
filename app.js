@@ -17,6 +17,7 @@ let currentVideoA = null;      // video id being rated
 let currentLangA = 'ZH';       // selected language for Module A ('ZH' or 'EN')
 let videoListA = { ZH: [], EN: [] }; // filenames loaded from manifest
 let watchMaxPos = 0;           // furthest playback position reached (seconds)
+let verticalCoverMode = '916'; // '169' (horizontal default) or '916' (vertical) for ZH grid
 let instrLang = 'en';          // instruction page language ('en' or 'zh')
 let userLang = null;           // user's selected language ('ZH' or 'EN')
 let currentVideoB = null;      // video id in module B
@@ -279,6 +280,18 @@ function switchLangA(lang) {
   renderModuleA();
 }
 
+function toggleCoverLayout() {
+  verticalCoverMode = verticalCoverMode === '916' ? '169' : '916';
+  const btn = document.getElementById('btn-cover-toggle');
+  if (verticalCoverMode === '916') {
+    btn.innerHTML = 'Cover: 16:9 / <strong>9:16</strong>';
+  } else {
+    btn.innerHTML = 'Cover: <strong>16:9</strong> / 9:16';
+  }
+  const grid = document.getElementById('grid-a');
+  grid.classList.toggle('vertical-layout', verticalCoverMode === '916');
+}
+
 function renderModuleA() {
   const grid = document.getElementById('grid-a');
   grid.innerHTML = '';
@@ -287,6 +300,16 @@ function renderModuleA() {
   document.querySelectorAll('.lang-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.lang === currentLangA);
   });
+
+  // Show cover toggle only on vertical (ZH) tab; apply vertical layout
+  const coverBtn = document.getElementById('btn-cover-toggle');
+  if (currentLangA === 'ZH') {
+    coverBtn.style.display = '';
+    grid.classList.toggle('vertical-layout', verticalCoverMode === '916');
+  } else {
+    coverBtn.style.display = 'none';
+    grid.classList.remove('vertical-layout');
+  }
 
   const vids = videoListA[currentLangA];
   const prefs = getPreferences().filter(p => p.user_id === currentUser && p.language === currentLangA);

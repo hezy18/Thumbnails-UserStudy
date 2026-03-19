@@ -137,6 +137,9 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 16px;
 }
+.video-grid.vertical-layout {
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
 .video-card {
   background: #fff; border-radius: 8px; overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer;
@@ -147,10 +150,18 @@ body {
   width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
   background: #e0e0e0;
 }
+.vertical-layout .video-card .card-thumb {
+  aspect-ratio: 9/16;
+}
 .video-card .card-label {
   padding: 8px 10px; font-size: 13px; text-align: center;
 }
 .video-card.rated .card-label { color: #27ae60; font-weight: 600; }
+.btn-cover-toggle {
+  background: #f0f0f0; color: #333; border: 1px solid #ccc;
+  font-size: 12px; padding: 4px 10px; margin-left: 8px;
+}
+.btn-cover-toggle:hover { background: #e0e0e0; }
 
 /* Player page */
 .player-section { max-width: 900px; margin: 0 auto; }
