@@ -606,19 +606,15 @@ const SURVEY_TEXT = {
     q5c: 'Key Objects & Close-ups (e.g., appetizing food, new gadgets)',
     q5d: 'Before & After Comparisons (e.g., success vs. failure)',
     q5e: 'Aesthetic & Atmosphere (e.g., scenic shots, sunsets, filters)',
-    q6: 'Q6. What kind of main subject do you prefer on a cover? (Single choice)',
-    q6a: 'Close-up Portraits',
-    q6b: 'Wide Shots with Environment',
-    q6c: 'Pure Text or Abstract Graphics',
-    q7: 'Q7. Thinking back to the videos you rated highly, did their covers have anything in common? (Short answer)',
-    q7hint: 'e.g., Bold titles, bright colors, specific subjects, etc.',
-    q8: 'Q8. Which types of covers make you feel "repelled" or unlikely to click? (Multiple choice)',
-    q8a: 'Clickbait / Exaggerated Text',
-    q8b: 'Blurry / Low Quality',
-    q8c: 'Cluttered / Eyesore Colors',
-    q8d: 'Misleading Content',
+    q6: 'Q7. Thinking back to the videos you rated highly, did their covers have anything in common? (Short answer)',
+    q6hint: 'e.g., Bold titles, bright colors, specific subjects, etc.',
+    q7: 'Q8. Which types of covers make you feel "repelled" or unlikely to click? (Multiple choice)',
+    q7a: 'Clickbait / Exaggerated Text',
+    q7b: 'Blurry / Low Quality',
+    q7c: 'Cluttered / Eyesore Colors',
+    q7d: 'Misleading Content',
     shortcut: 'Already finished? Take the brief survey here',
-    alertMin: 'Please answer all required questions (Q1–Q6, Q8).',
+    alertMin: 'Please answer all required questions (Q1–Q5, Q7).',
     alertQ5: 'Q5: Please select up to 3 items.',
     otherPlaceholder: 'Please specify...'
   },
@@ -657,19 +653,15 @@ const SURVEY_TEXT = {
     q5c: '关键物品/特写（如：诱人的食物、新款电子产品）',
     q5d: '结果对比（如：Before & After、成功与失败的对比）',
     q5e: '美感/氛围感（如：精美的空镜、落日、滤镜感）',
-    q6: '6. 您更倾向于看到什么样的封面主体？（单选）',
-    q6a: '清晰的人物大头贴/特写',
-    q6b: '远景或包含环境的大全景',
-    q6c: '纯文字说明或抽象图形',
-    q7: '7. 回想刚才您打高分的视频，它们的封面是否有共同点？（简答）',
-    q7hint: '例如：都有醒目的标题、配色都很明亮、都是小姐姐等',
-    q8: '8. 哪些封面会让您感到"反感"或绝对不会点击？（多选）',
-    q8a: '标题党/夸张文字',
-    q8b: '画面模糊/质量低下',
-    q8c: '色彩过于杂乱刺眼',
-    q8d: '内容与视频主题不符',
+    q6: '7. 回想刚才您打高分的视频，它们的封面是否有共同点？（简答）',
+    q6hint: '例如：都有醒目的标题、配色都很明亮、都是小姐姐等',
+    q7: '8. 哪些封面会让您感到"反感"或绝对不会点击？（多选）',
+    q7a: '标题党/夸张文字',
+    q7b: '画面模糊/质量低下',
+    q7c: '色彩过于杂乱刺眼',
+    q7d: '内容与视频主题不符',
     shortcut: '已完成？请点击此处填写简短调研',
-    alertMin: '请回答所有必填问题（Q1–Q6、Q8）。',
+    alertMin: '请回答所有必填问题（Q1–Q5、Q7）。',
     alertQ5: '第5题：请最多选择3项。',
     otherPlaceholder: '请简要说明…'
   }
@@ -718,20 +710,15 @@ function populateSurveyText() {
   document.getElementById('sq5-c').textContent = t.q5c;
   document.getElementById('sq5-d').textContent = t.q5d;
   document.getElementById('sq5-e').textContent = t.q5e;
-  // Q6 — subject preference
+  // Q6 — common features (short answer)
   document.getElementById('sq6-label').textContent = t.q6;
-  document.getElementById('sq6-a').textContent = t.q6a;
-  document.getElementById('sq6-b').textContent = t.q6b;
-  document.getElementById('sq6-c').textContent = t.q6c;
-  // Q7 — common features
+  document.getElementById('sq6-hint').textContent = t.q6hint;
+  // Q7 — repelling covers
   document.getElementById('sq7-label').textContent = t.q7;
-  document.getElementById('sq7-hint').textContent = t.q7hint;
-  // Q8 — repelling covers
-  document.getElementById('sq8-label').textContent = t.q8;
-  document.getElementById('sq8-a').textContent = t.q8a;
-  document.getElementById('sq8-b').textContent = t.q8b;
-  document.getElementById('sq8-c').textContent = t.q8c;
-  document.getElementById('sq8-d').textContent = t.q8d;
+  document.getElementById('sq7-a').textContent = t.q7a;
+  document.getElementById('sq7-b').textContent = t.q7b;
+  document.getElementById('sq7-c').textContent = t.q7c;
+  document.getElementById('sq7-d').textContent = t.q7d;
   // Shortcut link
   const link = document.getElementById('survey-shortcut-link');
   if (link) link.textContent = t.shortcut;
@@ -742,7 +729,7 @@ function openSurvey() {
   // Reset form
   document.querySelectorAll('#survey-form input[type="checkbox"], #survey-form input[type="radio"]').forEach(i => i.checked = false);
   document.querySelectorAll('#survey-form .survey-other-input').forEach(i => i.value = '');
-  document.getElementById('sq7-answer').value = '';
+  document.getElementById('sq6-answer').value = '';
   document.getElementById('survey-form').style.display = '';
   document.getElementById('survey-success').style.display = 'none';
   document.getElementById('survey-overlay').style.display = 'flex';
@@ -765,12 +752,11 @@ function submitSurvey() {
   const q3 = getCheckedValues('sq3');
   const q4 = getCheckedValues('sq4');
   const q5 = getCheckedValues('sq5');
-  const q6 = getCheckedValues('sq6');
-  const q7 = document.getElementById('sq7-answer').value.trim();
-  const q8 = getCheckedValues('sq8');
+  const q6 = document.getElementById('sq6-answer').value.trim();
+  const q7 = getCheckedValues('sq7');
 
   // Validate required fields
-  if (q1.length === 0 || q2.length === 0 || q3.length === 0 || q4.length === 0 || q5.length === 0 || q6.length === 0 || q8.length === 0) {
+  if (q1.length === 0 || q2.length === 0 || q3.length === 0 || q4.length === 0 || q5.length === 0 || q7.length === 0) {
     alert(t.alertMin);
     return;
   }
@@ -791,9 +777,8 @@ function submitSurvey() {
     q3_visual_style: q3.join(', '),
     q4_text_importance: q4[0],
     q5_click_elements: q5.join(', '),
-    q6_subject_preference: q6[0],
-    q7_common_features: q7,
-    q8_repelling_covers: q8.join(', '),
+    q6_common_features: q6,
+    q7_repelling_covers: q7.join(', '),
     timestamp: new Date().toISOString()
   };
 
@@ -962,8 +947,8 @@ function exportData() {
 
   text += '\n=== POST-STUDY SURVEY ===\n';
   if (survey) {
-    text += 'user_id\tq1_high_rating_reasons\tq2_low_rating_reasons\tq3_visual_style\tq4_text_importance\tq5_click_elements\tq6_subject_preference\tq7_common_features\tq8_repelling_covers\ttimestamp\n';
-    text += `${survey.user_id}\t${survey.q1_high_rating_reasons}\t${survey.q2_low_rating_reasons}\t${survey.q3_visual_style}\t${survey.q4_text_importance}\t${survey.q5_click_elements}\t${survey.q6_subject_preference}\t${survey.q7_common_features}\t${survey.q8_repelling_covers}\t${survey.timestamp}\n`;
+    text += 'user_id\tq1_high_rating_reasons\tq2_low_rating_reasons\tq3_visual_style\tq4_text_importance\tq5_click_elements\tq6_common_features\tq7_repelling_covers\ttimestamp\n';
+    text += `${survey.user_id}\t${survey.q1_high_rating_reasons}\t${survey.q2_low_rating_reasons}\t${survey.q3_visual_style}\t${survey.q4_text_importance}\t${survey.q5_click_elements}\t${survey.q6_common_features}\t${survey.q7_repelling_covers}\t${survey.timestamp}\n`;
   } else {
     text += '(No survey submitted yet)\n';
   }
