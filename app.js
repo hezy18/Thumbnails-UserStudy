@@ -2,7 +2,7 @@
 // Config — update VIDEO_BASE_URL to wherever your videos are hosted
 // ============================================================
 const VIDEO_BASE_URL = 'https://pub-4740265da8d444f58e0cfbce5100463d.r2.dev';
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxqEFJ6YJFI_VegExt_vBPs0TFzyFnA4yB1BabDaj_6Pohlp8X7zghFk2-lmq-RQsSc/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwYgvaUy6BnYdw-a8fDzbh9D9ih33Tw8dn6OWaUGd0PjzbX4CiY68liEAu0hh0syMBO/exec';
 // Maps internal language code → folder name in R2 bucket
 const VIDEO_FOLDER = { ZH: 'a-CH', EN: 'a-EN' };
 
