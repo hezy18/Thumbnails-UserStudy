@@ -395,6 +395,13 @@ body {
 }
 .survey-opt:hover { background: #f5f7fa; }
 .survey-opt input { margin: 0; flex-shrink: 0; width: 16px; height: 16px; accent-color: #4a90d9; }
+.survey-opt-other { flex-wrap: wrap; }
+.survey-other-input {
+  flex: 1; min-width: 120px; padding: 4px 8px; border: 1px solid #ddd;
+  border-radius: 4px; font-size: 13px; font-family: inherit;
+  margin-left: 4px;
+}
+.survey-other-input:focus { outline: none; border-color: #4a90d9; }
 .survey-hint { font-size: 13px; color: #999; margin-bottom: 8px; }
 .survey-textarea {
   width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px;

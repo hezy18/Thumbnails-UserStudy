@@ -298,56 +298,80 @@
         <h2 id="survey-title"></h2>
         <p id="survey-intro" class="survey-intro"></p>
 
-        <!-- Q1 Multiple Choice -->
+        <!-- Q1 Why high ratings (Multiple Choice + Other) -->
         <div class="survey-q">
           <p class="survey-q-label" id="sq1-label"></p>
-          <label class="survey-opt"><input type="checkbox" name="sq1" value="minimalist"><span id="sq1-a"></span></label>
-          <label class="survey-opt"><input type="checkbox" name="sq1" value="high_info"><span id="sq1-b"></span></label>
-          <label class="survey-opt"><input type="checkbox" name="sq1" value="high_saturation"><span id="sq1-c"></span></label>
-          <label class="survey-opt"><input type="checkbox" name="sq1" value="natural"><span id="sq1-d"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq1" value="visual_appeal"><span id="sq1-a"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq1" value="title_text"><span id="sq1-b"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq1" value="topic_interest"><span id="sq1-c"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq1" value="emotional_value"><span id="sq1-d"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq1" value="info_dense"><span id="sq1-e"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq1" value="person_charm"><span id="sq1-f"></span></label>
+          <label class="survey-opt survey-opt-other"><input type="checkbox" name="sq1" value="other"><span id="sq1-g"></span><input type="text" id="sq1-other" class="survey-other-input" placeholder=""></label>
         </div>
 
-        <!-- Q2 Single Choice -->
+        <!-- Q2 Why low ratings / skipped (Multiple Choice + Other) -->
         <div class="survey-q">
           <p class="survey-q-label" id="sq2-label"></p>
-          <label class="survey-opt"><input type="radio" name="sq2" value="very_important"><span id="sq2-a"></span></label>
-          <label class="survey-opt"><input type="radio" name="sq2" value="somewhat_important"><span id="sq2-b"></span></label>
-          <label class="survey-opt"><input type="radio" name="sq2" value="neutral"><span id="sq2-c"></span></label>
-          <label class="survey-opt"><input type="radio" name="sq2" value="unimportant"><span id="sq2-d"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq2" value="poor_quality"><span id="sq2-a"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq2" value="clickbait_title"><span id="sq2-b"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq2" value="no_interest"><span id="sq2-c"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq2" value="visual_fatigue"><span id="sq2-d"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq2" value="info_missing"><span id="sq2-e"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq2" value="discomfort"><span id="sq2-f"></span></label>
+          <label class="survey-opt survey-opt-other"><input type="checkbox" name="sq2" value="other"><span id="sq2-g"></span><input type="text" id="sq2-other" class="survey-other-input" placeholder=""></label>
         </div>
 
-        <!-- Q3 Multiple Choice (top 3) -->
+        <!-- Q3 Visual style preference (Multiple Choice) -->
         <div class="survey-q">
           <p class="survey-q-label" id="sq3-label"></p>
-          <label class="survey-opt"><input type="checkbox" name="sq3" value="expressions"><span id="sq3-a"></span></label>
-          <label class="survey-opt"><input type="checkbox" name="sq3" value="action"><span id="sq3-b"></span></label>
-          <label class="survey-opt"><input type="checkbox" name="sq3" value="objects"><span id="sq3-c"></span></label>
-          <label class="survey-opt"><input type="checkbox" name="sq3" value="comparison"><span id="sq3-d"></span></label>
-          <label class="survey-opt"><input type="checkbox" name="sq3" value="aesthetic"><span id="sq3-e"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq3" value="minimalist"><span id="sq3-a"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq3" value="high_info"><span id="sq3-b"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq3" value="high_saturation"><span id="sq3-c"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq3" value="natural"><span id="sq3-d"></span></label>
         </div>
 
-        <!-- Q4 Single Choice -->
+        <!-- Q4 Text importance (Single Choice) -->
         <div class="survey-q">
           <p class="survey-q-label" id="sq4-label"></p>
-          <label class="survey-opt"><input type="radio" name="sq4" value="closeup"><span id="sq4-a"></span></label>
-          <label class="survey-opt"><input type="radio" name="sq4" value="wide_shot"><span id="sq4-b"></span></label>
-          <label class="survey-opt"><input type="radio" name="sq4" value="text_abstract"><span id="sq4-c"></span></label>
+          <label class="survey-opt"><input type="radio" name="sq4" value="very_important"><span id="sq4-a"></span></label>
+          <label class="survey-opt"><input type="radio" name="sq4" value="somewhat_important"><span id="sq4-b"></span></label>
+          <label class="survey-opt"><input type="radio" name="sq4" value="neutral"><span id="sq4-c"></span></label>
+          <label class="survey-opt"><input type="radio" name="sq4" value="unimportant"><span id="sq4-d"></span></label>
         </div>
 
-        <!-- Q5 Short Answer -->
+        <!-- Q5 Click-exciting elements (Multiple Choice, top 3) -->
         <div class="survey-q">
           <p class="survey-q-label" id="sq5-label"></p>
-          <p class="survey-hint" id="sq5-hint"></p>
-          <textarea id="sq5-answer" class="survey-textarea" rows="3"></textarea>
+          <label class="survey-opt"><input type="checkbox" name="sq5" value="expressions"><span id="sq5-a"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq5" value="action"><span id="sq5-b"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq5" value="objects"><span id="sq5-c"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq5" value="comparison"><span id="sq5-d"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq5" value="aesthetic"><span id="sq5-e"></span></label>
         </div>
 
-        <!-- Q6 Multiple Choice -->
+        <!-- Q6 Subject preference (Single Choice) -->
         <div class="survey-q">
           <p class="survey-q-label" id="sq6-label"></p>
-          <label class="survey-opt"><input type="checkbox" name="sq6" value="clickbait"><span id="sq6-a"></span></label>
-          <label class="survey-opt"><input type="checkbox" name="sq6" value="blurry"><span id="sq6-b"></span></label>
-          <label class="survey-opt"><input type="checkbox" name="sq6" value="cluttered"><span id="sq6-c"></span></label>
-          <label class="survey-opt"><input type="checkbox" name="sq6" value="misleading"><span id="sq6-d"></span></label>
+          <label class="survey-opt"><input type="radio" name="sq6" value="closeup"><span id="sq6-a"></span></label>
+          <label class="survey-opt"><input type="radio" name="sq6" value="wide_shot"><span id="sq6-b"></span></label>
+          <label class="survey-opt"><input type="radio" name="sq6" value="text_abstract"><span id="sq6-c"></span></label>
+        </div>
+
+        <!-- Q7 Common features of highly-rated (Short Answer) -->
+        <div class="survey-q">
+          <p class="survey-q-label" id="sq7-label"></p>
+          <p class="survey-hint" id="sq7-hint"></p>
+          <textarea id="sq7-answer" class="survey-textarea" rows="3"></textarea>
+        </div>
+
+        <!-- Q8 Repelling covers (Multiple Choice) -->
+        <div class="survey-q">
+          <p class="survey-q-label" id="sq8-label"></p>
+          <label class="survey-opt"><input type="checkbox" name="sq8" value="clickbait"><span id="sq8-a"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq8" value="blurry"><span id="sq8-b"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq8" value="cluttered"><span id="sq8-c"></span></label>
+          <label class="survey-opt"><input type="checkbox" name="sq8" value="misleading"><span id="sq8-d"></span></label>
         </div>
 
         <div class="survey-actions">

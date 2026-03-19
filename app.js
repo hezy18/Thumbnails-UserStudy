@@ -530,70 +530,104 @@ const SURVEY_TEXT = {
   EN: {
     title: 'Post-Study Survey',
     intro: 'Please answer the following questions. It should take less than 1 minute.',
-    q1: 'Q1. What visual style do you usually prefer when browsing video covers? (Multiple choice)',
-    q1a: 'Minimalist (clean composition, minimal text)',
-    q1b: 'High Information (rich elements, highlighted text)',
-    q1c: 'High Saturation & Contrast (vivid colors, strong visual impact)',
-    q1d: 'Natural & Documentary (real screenshots, no filters or effects)',
-    q2: 'Q2. How does text on a cover affect your desire to click? (Single choice)',
-    q2a: 'Very important — text directly determines whether I click',
-    q2b: 'Somewhat important — serves a supplementary role',
-    q2c: 'Neutral — I care more about the image',
-    q2d: 'Unimportant — text even blocks the image',
-    q3: 'Q3. Which elements most excite your desire to click? (Select up to 3)',
-    q3a: 'Human Expressions (e.g., surprise, laughter, crying)',
-    q3b: 'Action Moments (e.g., extreme sports, goals, crafting)',
-    q3c: 'Key Objects & Close-ups (e.g., appetizing food, new gadgets)',
-    q3d: 'Before & After Comparisons (e.g., success vs. failure)',
-    q3e: 'Aesthetic & Atmosphere (e.g., scenic shots, sunsets, filters)',
-    q4: 'Q4. What kind of main subject do you prefer on a cover? (Single choice)',
-    q4a: 'Close-up Portraits',
-    q4b: 'Wide Shots with Environment',
-    q4c: 'Pure Text or Abstract Graphics',
-    q5: 'Q5. Thinking back to the videos you rated highly, did their covers have anything in common? (Short answer)',
-    q5hint: 'e.g., Bold titles, bright colors, specific subjects, etc.',
-    q6: 'Q6. Which types of covers make you feel "repelled" or unlikely to click? (Multiple choice)',
-    q6a: 'Clickbait / Exaggerated Text',
-    q6b: 'Blurry / Low Quality',
-    q6c: 'Cluttered / Eyesore Colors',
-    q6d: 'Misleading Content',
+    q1: 'Q1. Thinking back to the videos you rated highly (or liked), what attracted you the most? (Multiple choice)',
+    q1a: 'Outstanding cover visuals: beautiful composition, comfortable colors, or clear image quality',
+    q1b: 'Catchy title/text: the copy hits a pain point, or creates strong suspense',
+    q1c: 'Interested in the topic itself: it happens to be a field I usually follow (e.g., food, tech)',
+    q1d: 'Emotional value: the emotion conveyed by the cover (e.g., healing, funny, stunning) attracted me',
+    q1e: 'High information density: I can immediately see the core content without wasting time',
+    q1f: 'Person charm: the creator on the cover is attractive, or a familiar face',
+    q1g: 'Other reason:',
+    q2: 'Q2. For the videos you skipped or rated low, what was the main reason? (Multiple choice)',
+    q2a: 'Poor cover quality: blurry image, messy layout, or outdated aesthetics',
+    q2b: 'Typical "clickbait": overly exaggerated text, feels misleading, creates aversion',
+    q2c: 'Content mismatch: completely not interested in that topic/field',
+    q2d: 'Visual fatigue: covers all look the same, nothing fresh',
+    q2e: 'Missing information: cover is too abstract, can\'t tell what the video is about',
+    q2f: 'Intuitive discomfort: cover contains uncomfortable elements (e.g., deliberate ugliness, vulgarity)',
+    q2g: 'Other reason:',
+    q3: 'Q3. What visual style do you usually prefer when browsing video covers? (Multiple choice)',
+    q3a: 'Minimalist (clean composition, minimal text)',
+    q3b: 'High Information (rich elements, highlighted text)',
+    q3c: 'High Saturation & Contrast (vivid colors, strong visual impact)',
+    q3d: 'Natural & Documentary (real screenshots, no filters or effects)',
+    q4: 'Q4. How does text on a cover affect your desire to click? (Single choice)',
+    q4a: 'Very important — text directly determines whether I click',
+    q4b: 'Somewhat important — serves a supplementary role',
+    q4c: 'Neutral — I care more about the image',
+    q4d: 'Unimportant — text even blocks the image',
+    q5: 'Q5. Which elements most excite your desire to click? (Select up to 3)',
+    q5a: 'Human Expressions (e.g., surprise, laughter, crying)',
+    q5b: 'Action Moments (e.g., extreme sports, goals, crafting)',
+    q5c: 'Key Objects & Close-ups (e.g., appetizing food, new gadgets)',
+    q5d: 'Before & After Comparisons (e.g., success vs. failure)',
+    q5e: 'Aesthetic & Atmosphere (e.g., scenic shots, sunsets, filters)',
+    q6: 'Q6. What kind of main subject do you prefer on a cover? (Single choice)',
+    q6a: 'Close-up Portraits',
+    q6b: 'Wide Shots with Environment',
+    q6c: 'Pure Text or Abstract Graphics',
+    q7: 'Q7. Thinking back to the videos you rated highly, did their covers have anything in common? (Short answer)',
+    q7hint: 'e.g., Bold titles, bright colors, specific subjects, etc.',
+    q8: 'Q8. Which types of covers make you feel "repelled" or unlikely to click? (Multiple choice)',
+    q8a: 'Clickbait / Exaggerated Text',
+    q8b: 'Blurry / Low Quality',
+    q8c: 'Cluttered / Eyesore Colors',
+    q8d: 'Misleading Content',
     shortcut: 'Already finished? Take the brief survey here',
-    alertMin: 'Please answer all required questions (Q1–Q4, Q6).',
-    alertQ3: 'Q3: Please select up to 3 items.'
+    alertMin: 'Please answer all required questions (Q1–Q6, Q8).',
+    alertQ5: 'Q5: Please select up to 3 items.',
+    otherPlaceholder: 'Please specify...'
   },
   ZH: {
     title: '实验后简短调研',
     intro: '请您回答以下问题，所需时间不超过1分钟。',
-    q1: '1. 在浏览视频封面时，您通常更偏好哪种视觉风格？（多选）',
-    q1a: '极简主义（构图干净，文字少）',
-    q1b: '高信息量（元素丰富，有重点文字标注）',
-    q1c: '高饱和/高对比度（色彩鲜艳，视觉冲击力强）',
-    q1d: '自然纪实（真实视频截图，不加滤镜或特效）',
-    q2: '2. 封面上出现的文字对您的吸引力影响如何？（单选）',
-    q2a: '非常重要，文字直接决定我是否点击',
-    q2b: '比较重要，起补充说明作用',
-    q2c: '一般，我更看重画面内容',
-    q2d: '不重要，甚至觉得文字会遮挡画面',
-    q3: '3. 以下哪些元素最能激发您的点击欲望？（请选择最相关的3项）',
-    q3a: '人物表情（如：惊讶、大笑、哭泣）',
-    q3b: '动作瞬间（如：极限运动、精彩进球、手工制作中）',
-    q3c: '关键物品/特写（如：诱人的食物、新款电子产品）',
-    q3d: '结果对比（如：Before & After、成功与失败的对比）',
-    q3e: '美感/氛围感（如：精美的空镜、落日、滤镜感）',
-    q4: '4. 您更倾向于看到什么样的封面主体？（单选）',
-    q4a: '清晰的人物大头贴/特写',
-    q4b: '远景或包含环境的大全景',
-    q4c: '纯文字说明或抽象图形',
-    q5: '5. 回想刚才您打高分的视频，它们的封面是否有共同点？（简答）',
-    q5hint: '例如：都有醒目的标题、配色都很明亮、都是小姐姐等',
-    q6: '6. 哪些封面会让您感到"反感"或绝对不会点击？（多选）',
-    q6a: '标题党/夸张文字',
-    q6b: '画面模糊/质量低下',
-    q6c: '色彩过于杂乱刺眼',
-    q6d: '内容与视频主题不符',
+    q1: '1. 回想刚才您打高分（或选择喜欢）的视频，最吸引您的原因是？（多选）',
+    q1a: '封面视觉出众：构图美观、色彩舒适或画质清晰',
+    q1b: '标题/文字抓人：文案直击痛点，或者产生了强烈的悬念',
+    q1c: '题材本身感兴趣：正好是我平时关注的领域（如美食、科技等）',
+    q1d: '情绪价值：封面传达出的情绪（如治愈、搞笑、震撼）吸引了我',
+    q1e: '信息量大：一眼就能看出视频核心内容，不浪费时间',
+    q1f: '人物魅力：封面上的博主颜值高，或是我熟悉的某个面孔',
+    q1g: '其他理由：',
+    q2: '2. 对于那些您直接跳过或打低分的视频，主要原因是？（多选）',
+    q2a: '封面质感差：画面模糊、排版凌乱或审美过时',
+    q2b: '典型的"标题党"：文字过于夸张，感觉名不副实，产生反感',
+    q2c: '内容不匹配：对该视频所属的领域完全不感兴趣',
+    q2d: '视觉疲劳：封面风格千篇一律，没有新意',
+    q2e: '信息缺失：封面太抽象，看不出视频到底要讲什么',
+    q2f: '直觉上的不适：封面包含让人不适的元素（如刻意扮丑、低俗等）',
+    q2g: '其他理由：',
+    q3: '3. 在浏览视频封面时，您通常更偏好哪种视觉风格？（多选）',
+    q3a: '极简主义（构图干净，文字少）',
+    q3b: '高信息量（元素丰富，有重点文字标注）',
+    q3c: '高饱和/高对比度（色彩鲜艳，视觉冲击力强）',
+    q3d: '自然纪实（真实视频截图，不加滤镜或特效）',
+    q4: '4. 封面上出现的文字对您的吸引力影响如何？（单选）',
+    q4a: '非常重要，文字直接决定我是否点击',
+    q4b: '比较重要，起补充说明作用',
+    q4c: '一般，我更看重画面内容',
+    q4d: '不重要，甚至觉得文字会遮挡画面',
+    q5: '5. 以下哪些元素最能激发您的点击欲望？（请选择最相关的3项）',
+    q5a: '人物表情（如：惊讶、大笑、哭泣）',
+    q5b: '动作瞬间（如：极限运动、精彩进球、手工制作中）',
+    q5c: '关键物品/特写（如：诱人的食物、新款电子产品）',
+    q5d: '结果对比（如：Before & After、成功与失败的对比）',
+    q5e: '美感/氛围感（如：精美的空镜、落日、滤镜感）',
+    q6: '6. 您更倾向于看到什么样的封面主体？（单选）',
+    q6a: '清晰的人物大头贴/特写',
+    q6b: '远景或包含环境的大全景',
+    q6c: '纯文字说明或抽象图形',
+    q7: '7. 回想刚才您打高分的视频，它们的封面是否有共同点？（简答）',
+    q7hint: '例如：都有醒目的标题、配色都很明亮、都是小姐姐等',
+    q8: '8. 哪些封面会让您感到"反感"或绝对不会点击？（多选）',
+    q8a: '标题党/夸张文字',
+    q8b: '画面模糊/质量低下',
+    q8c: '色彩过于杂乱刺眼',
+    q8d: '内容与视频主题不符',
     shortcut: '已完成？请点击此处填写简短调研',
-    alertMin: '请回答所有必填问题（Q1–Q4、Q6）。',
-    alertQ3: '第3题：请最多选择3项。'
+    alertMin: '请回答所有必填问题（Q1–Q6、Q8）。',
+    alertQ5: '第5题：请最多选择3项。',
+    otherPlaceholder: '请简要说明…'
   }
 };
 
@@ -601,33 +635,59 @@ function populateSurveyText() {
   const t = SURVEY_TEXT[userLang] || SURVEY_TEXT.EN;
   document.getElementById('survey-title').textContent = t.title;
   document.getElementById('survey-intro').textContent = t.intro;
+  // Q1 — why high ratings
   document.getElementById('sq1-label').textContent = t.q1;
   document.getElementById('sq1-a').textContent = t.q1a;
   document.getElementById('sq1-b').textContent = t.q1b;
   document.getElementById('sq1-c').textContent = t.q1c;
   document.getElementById('sq1-d').textContent = t.q1d;
+  document.getElementById('sq1-e').textContent = t.q1e;
+  document.getElementById('sq1-f').textContent = t.q1f;
+  document.getElementById('sq1-g').textContent = t.q1g;
+  document.getElementById('sq1-other').placeholder = t.otherPlaceholder;
+  // Q2 — why low ratings
   document.getElementById('sq2-label').textContent = t.q2;
   document.getElementById('sq2-a').textContent = t.q2a;
   document.getElementById('sq2-b').textContent = t.q2b;
   document.getElementById('sq2-c').textContent = t.q2c;
   document.getElementById('sq2-d').textContent = t.q2d;
+  document.getElementById('sq2-e').textContent = t.q2e;
+  document.getElementById('sq2-f').textContent = t.q2f;
+  document.getElementById('sq2-g').textContent = t.q2g;
+  document.getElementById('sq2-other').placeholder = t.otherPlaceholder;
+  // Q3 — visual style
   document.getElementById('sq3-label').textContent = t.q3;
   document.getElementById('sq3-a').textContent = t.q3a;
   document.getElementById('sq3-b').textContent = t.q3b;
   document.getElementById('sq3-c').textContent = t.q3c;
   document.getElementById('sq3-d').textContent = t.q3d;
-  document.getElementById('sq3-e').textContent = t.q3e;
+  // Q4 — text importance
   document.getElementById('sq4-label').textContent = t.q4;
   document.getElementById('sq4-a').textContent = t.q4a;
   document.getElementById('sq4-b').textContent = t.q4b;
   document.getElementById('sq4-c').textContent = t.q4c;
+  document.getElementById('sq4-d').textContent = t.q4d;
+  // Q5 — click elements
   document.getElementById('sq5-label').textContent = t.q5;
-  document.getElementById('sq5-hint').textContent = t.q5hint;
+  document.getElementById('sq5-a').textContent = t.q5a;
+  document.getElementById('sq5-b').textContent = t.q5b;
+  document.getElementById('sq5-c').textContent = t.q5c;
+  document.getElementById('sq5-d').textContent = t.q5d;
+  document.getElementById('sq5-e').textContent = t.q5e;
+  // Q6 — subject preference
   document.getElementById('sq6-label').textContent = t.q6;
   document.getElementById('sq6-a').textContent = t.q6a;
   document.getElementById('sq6-b').textContent = t.q6b;
   document.getElementById('sq6-c').textContent = t.q6c;
-  document.getElementById('sq6-d').textContent = t.q6d;
+  // Q7 — common features
+  document.getElementById('sq7-label').textContent = t.q7;
+  document.getElementById('sq7-hint').textContent = t.q7hint;
+  // Q8 — repelling covers
+  document.getElementById('sq8-label').textContent = t.q8;
+  document.getElementById('sq8-a').textContent = t.q8a;
+  document.getElementById('sq8-b').textContent = t.q8b;
+  document.getElementById('sq8-c').textContent = t.q8c;
+  document.getElementById('sq8-d').textContent = t.q8d;
   // Shortcut link
   const link = document.getElementById('survey-shortcut-link');
   if (link) link.textContent = t.shortcut;
@@ -637,7 +697,8 @@ function openSurvey() {
   populateSurveyText();
   // Reset form
   document.querySelectorAll('#survey-form input[type="checkbox"], #survey-form input[type="radio"]').forEach(i => i.checked = false);
-  document.getElementById('sq5-answer').value = '';
+  document.querySelectorAll('#survey-form .survey-other-input').forEach(i => i.value = '');
+  document.getElementById('sq7-answer').value = '';
   document.getElementById('survey-form').style.display = '';
   document.getElementById('survey-success').style.display = 'none';
   document.getElementById('survey-overlay').style.display = 'flex';
@@ -654,33 +715,46 @@ function getCheckedValues(name) {
 function submitSurvey() {
   const t = SURVEY_TEXT[userLang] || SURVEY_TEXT.EN;
   const q1 = getCheckedValues('sq1');
+  const q1other = document.getElementById('sq1-other').value.trim();
   const q2 = getCheckedValues('sq2');
+  const q2other = document.getElementById('sq2-other').value.trim();
   const q3 = getCheckedValues('sq3');
   const q4 = getCheckedValues('sq4');
-  const q5 = document.getElementById('sq5-answer').value.trim();
+  const q5 = getCheckedValues('sq5');
   const q6 = getCheckedValues('sq6');
+  const q7 = document.getElementById('sq7-answer').value.trim();
+  const q8 = getCheckedValues('sq8');
 
   // Validate required fields
-  if (q1.length === 0 || q2.length === 0 || q3.length === 0 || q4.length === 0 || q6.length === 0) {
+  if (q1.length === 0 || q2.length === 0 || q3.length === 0 || q4.length === 0 || q5.length === 0 || q6.length === 0 || q8.length === 0) {
     alert(t.alertMin);
     return;
   }
-  if (q3.length > 3) {
-    alert(t.alertQ3);
+  if (q5.length > 3) {
+    alert(t.alertQ5);
     return;
   }
+
+  // Build "other" text into q1/q2 values if checked
+  const q1vals = q1.map(v => v === 'other' && q1other ? `other: ${q1other}` : v);
+  const q2vals = q2.map(v => v === 'other' && q2other ? `other: ${q2other}` : v);
 
   const surveyData = {
     user_id: currentUser,
     type: 'survey',
-    q1_visual_style: q1.join(', '),
-    q2_text_importance: q2[0],
-    q3_click_elements: q3.join(', '),
-    q4_subject_preference: q4[0],
-    q5_common_features: q5,
-    q6_repelling_covers: q6.join(', '),
+    q1_high_rating_reasons: q1vals.join(', '),
+    q2_low_rating_reasons: q2vals.join(', '),
+    q3_visual_style: q3.join(', '),
+    q4_text_importance: q4[0],
+    q5_click_elements: q5.join(', '),
+    q6_subject_preference: q6[0],
+    q7_common_features: q7,
+    q8_repelling_covers: q8.join(', '),
     timestamp: new Date().toISOString()
   };
+
+  // Persist to localStorage so export and retry work
+  localStorage.setItem('surveyData', JSON.stringify(surveyData));
 
   const preferences = getPreferences().filter(p => p.user_id === currentUser);
   const payload = { preferences, survey: surveyData };
@@ -826,6 +900,7 @@ function buildStars(containerId, onChange) {
 function exportData() {
   const prefs = getPreferences();
   const resps = getResponses();
+  const survey = JSON.parse(localStorage.getItem('surveyData') || 'null');
 
   let text = '=== USER PREFERENCES (Module A) ===\n';
   text += 'user_id\tlanguage\tvideo_id\trating\twatch_max_pos\tvideo_duration\twatch_ratio\ttimestamp\n';
@@ -838,6 +913,14 @@ function exportData() {
   resps.forEach(r => {
     text += `${r.user_id}\t${r.video_id}\t${r.selected_thumbnail}\t${r.score_quality}\t${r.score_relevance}\t${r.score_preference}\t${r.timestamp}\n`;
   });
+
+  text += '\n=== POST-STUDY SURVEY ===\n';
+  if (survey) {
+    text += 'user_id\tq1_high_rating_reasons\tq2_low_rating_reasons\tq3_visual_style\tq4_text_importance\tq5_click_elements\tq6_subject_preference\tq7_common_features\tq8_repelling_covers\ttimestamp\n';
+    text += `${survey.user_id}\t${survey.q1_high_rating_reasons}\t${survey.q2_low_rating_reasons}\t${survey.q3_visual_style}\t${survey.q4_text_importance}\t${survey.q5_click_elements}\t${survey.q6_subject_preference}\t${survey.q7_common_features}\t${survey.q8_repelling_covers}\t${survey.timestamp}\n`;
+  } else {
+    text += '(No survey submitted yet)\n';
+  }
 
   const blob = new Blob([text], { type: 'text/plain' });
   const a = document.createElement('a');
