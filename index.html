@@ -14,9 +14,21 @@
       <div class="login-box">
         <h1>Video Experiment</h1>
         <div id="login-error" class="login-error" style="display:none"></div>
-        <input type="text" id="input-uid" placeholder="User ID">
-        <input type="password" id="input-pwd" placeholder="Password">
-        <button onclick="doLogin()">Login</button>
+        <!-- Sign In (default) -->
+        <div id="signin-form">
+          <input type="text" id="input-uid" placeholder="User ID">
+          <input type="password" id="input-pwd" placeholder="Password">
+          <button onclick="doLogin()">Sign In / 登录</button>
+          <p class="login-switch">Don't have an account? / 没有账号？ <a href="#" onclick="toggleSignUp(true);return false;">Sign Up / 注册</a></p>
+        </div>
+        <!-- Sign Up -->
+        <div id="signup-form" style="display:none">
+          <input type="text" id="signup-uid" placeholder="Choose a User ID / 输入用户名">
+          <input type="password" id="signup-pwd" placeholder="Choose a Password / 输入密码">
+          <input type="password" id="signup-pwd2" placeholder="Confirm Password / 确认密码">
+          <button onclick="doSignUp()">Sign Up / 注册</button>
+          <p class="login-switch">Already have an account? / 已有账号？ <a href="#" onclick="toggleSignUp(false);return false;">Sign In / 登录</a></p>
+        </div>
       </div>
     </div>
   </div>

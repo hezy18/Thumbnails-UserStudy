@@ -109,6 +109,11 @@ async function loadUsers() {
   } catch (e) {
     console.error('Failed to load users.txt', e);
   }
+  // Merge locally registered users from localStorage
+  const local = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+  local.forEach(u => {
+    if (!users.find(x => x.id === u.id)) users.push(u);
+  });
 }
 
 async function loadVideoListA() {
@@ -213,7 +218,66 @@ function doLogout() {
   localStorage.removeItem('instrSeen');
   document.getElementById('input-uid').value = '';
   document.getElementById('input-pwd').value = '';
+  toggleSignUp(false);
   showView('view-login');
+}
+
+function toggleSignUp(show) {
+  document.getElementById('signin-form').style.display = show ? 'none' : '';
+  document.getElementById('signup-form').style.display = show ? '' : 'none';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+function doSignUp() {
+  const uid = document.getElementById('signup-uid').value.trim();
+  const pwd = document.getElementById('signup-pwd').value.trim();
+  const pwd2 = document.getElementById('signup-pwd2').value.trim();
+  const errEl = document.getElementById('login-error');
+
+  if (!uid || !pwd) {
+    errEl.textContent = 'Please fill in all fields. / 请填写所有字段。';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (pwd !== pwd2) {
+    errEl.textContent = 'Passwords do not match. / 两次密码不一致。';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (users.find(u => u.id === uid)) {
+    errEl.textContent = 'User ID already exists. / 该用户名已存在。';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  // Save to in-memory list
+  users.push({ id: uid, password: pwd });
+
+  // Persist to localStorage so this device remembers the account
+  const local = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+  local.push({ id: uid, password: pwd });
+  localStorage.setItem('registeredUsers', JSON.stringify(local));
+
+  // Also send to Google Sheets for experimenter records
+  try {
+    fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ signup: { user_id: uid, timestamp: new Date().toISOString() } })
+    });
+  } catch (e) { console.warn('Signup sheet error:', e); }
+
+  errEl.style.display = 'none';
+  // Auto sign in after registration
+  document.getElementById('signup-uid').value = '';
+  document.getElementById('signup-pwd').value = '';
+  document.getElementById('signup-pwd2').value = '';
+  toggleSignUp(false);
+  currentUser = uid;
+  localStorage.setItem('currentUser', uid);
+  syncUserLabels(uid);
+  showView('view-lang-select');
 }
 
 function selectLang(lang) {
