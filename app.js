@@ -19,6 +19,7 @@ let videoListA = { ZH: [], EN: [] }; // filenames loaded from manifest
 let watchMaxPos = 0;           // furthest playback position reached (seconds)
 let instrLang = 'en';          // instruction page language ('en' or 'zh')
 let userLang = null;           // user's selected language ('ZH' or 'EN')
+let canViewChinese = false;    // EN user can understand Chinese videos
 let currentVideoB = null;      // video id in module B
 let selectedThumb = null;      // chosen thumbnail (1-6)
 let ratingsB = { quality: 0, relevance: 0, preference: 0 };
@@ -83,6 +84,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       userLang = savedLang;
       currentLangA = savedLang === 'ZH' ? 'ZH' : 'EN';
       instrLang = savedLang === 'ZH' ? 'zh' : 'en';
+      canViewChinese = localStorage.getItem('canViewChinese') === '1';
       // Skip instructions on return visits — go straight to Module A
       if (localStorage.getItem('instrSeen')) {
         showView('view-module-a');
@@ -211,10 +213,12 @@ function doLogin() {
 function doLogout() {
   currentUser = null;
   userLang = null;
+  canViewChinese = false;
   currentLangA = 'ZH';
   instrLang = 'en';
   localStorage.removeItem('currentUser');
   localStorage.removeItem('userLang');
+  localStorage.removeItem('canViewChinese');
   localStorage.removeItem('instrSeen');
   document.getElementById('input-uid').value = '';
   document.getElementById('input-pwd').value = '';
@@ -285,6 +289,25 @@ function selectLang(lang) {
   localStorage.setItem('userLang', lang);
   currentLangA = lang === 'ZH' ? 'ZH' : 'EN';
   instrLang = lang === 'ZH' ? 'zh' : 'en';
+  if (lang === 'EN') {
+    showView('view-chinese-check');
+  } else {
+    canViewChinese = true;
+    localStorage.setItem('canViewChinese', '1');
+    showView('view-instructions');
+  }
+}
+
+function setChinese(canView) {
+  canViewChinese = canView;
+  localStorage.setItem('canViewChinese', canView ? '1' : '0');
+  // Update English instruction step 5 based on choice
+  const step5zh = document.getElementById('instr-en-step5-zh');
+  const step5en = document.getElementById('instr-en-step5-en');
+  if (step5zh && step5en) {
+    step5zh.style.display = canView ? 'list-item' : 'none';
+    step5en.style.display = canView ? 'none' : 'list-item';
+  }
   showView('view-instructions');
 }
 
@@ -304,6 +327,13 @@ function switchInstrLang(lang) {
   document.querySelectorAll('.instr-lang-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.lang === lang);
   });
+  // Update English step 5 based on canViewChinese
+  const step5zh = document.getElementById('instr-en-step5-zh');
+  const step5en = document.getElementById('instr-en-step5-en');
+  if (step5zh && step5en) {
+    step5zh.style.display = canViewChinese ? 'list-item' : 'none';
+    step5en.style.display = canViewChinese ? 'none' : 'list-item';
+  }
 }
 
 let instrCountdownTimer = null;
@@ -548,11 +578,12 @@ function updateFinishBtn() {
   const enRated = allPrefs.filter(p => p.language === 'EN').length;
 
   let ready, label;
-  if (userLang === 'EN') {
+  if (userLang === 'EN' && !canViewChinese) {
+    // EN user who cannot understand Chinese: 20 horizontal, vertical optional
     ready = enRated >= 20;
-    label = ready ? 'Finish A ✓' : `Finish A (Horizontal ${enRated}/20)`;
+    label = ready ? 'Finish A ✓' : `Finish A (Vertical ${zhRated}/optional, Horizontal ${enRated}/20)`;
   } else {
-    // ZH users (also default for null / unknown)
+    // ZH users OR EN users who can understand Chinese: 10 each
     ready = zhRated >= 10 && enRated >= 10;
     label = ready ? 'Finish A ✓' : `Finish A (Vertical ${zhRated}/10, Horizontal ${enRated}/10)`;
   }
@@ -956,7 +987,7 @@ function exportData() {
   const blob = new Blob([text], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `experiment_data_${new Date().toISOString().slice(0, 10)}.txt`;
+  a.download = `experiment_data_${currentUser}_${new Date().toISOString().slice(0, 10)}.txt`;
   a.click();
   URL.revokeObjectURL(a.href);
 }

@@ -45,6 +45,18 @@
     </div>
   </div>
 
+  <!-- CHINESE VIDEO CHECK (EN users only) -->
+  <div id="view-chinese-check" class="view">
+    <div class="login-container">
+      <div class="login-box">
+        <h1>Video Experiment</h1>
+        <p class="lang-select-hint">Can you view and understand Chinese videos?</p>
+        <button class="lang-select-btn" onclick="setChinese(true)">Yes, I can understand Chinese videos</button>
+        <button class="lang-select-btn lang-select-btn-en" onclick="setChinese(false)">No, I cannot understand Chinese videos</button>
+      </div>
+    </div>
+  </div>
+
   <!-- INSTRUCTIONS VIEW -->
   <div id="view-instructions" class="view">
     <div class="header">
@@ -75,7 +87,8 @@
               <li><strong>Select Videos:</strong> Browse the selection page and pick <strong>video covers that genuinely interest you</strong> to watch. <strong>You do not need to click every video in order.</strong></li>
               <li><strong>Watch &amp; Rate:</strong> Please watch the video in its entirety before providing a rating based on your <strong>true level of interest in the video content</strong>.</li>
               <li><strong>Skip Mechanism:</strong> If you do not wish to continue watching the current video, you may stop at any time and <strong>provide a rating</strong>, then return to the list.</li>
-              <li><strong>Target Count:</strong> Please complete watching and rating <strong><u>10–15 videos each</u></strong> for Horizontal and Vertical, totaling <strong>20–30</strong> videos.</li>
+              <li id="instr-en-step5-zh" style="display:none"><strong>Target Count:</strong> Please complete watching and rating <strong><u>10–15 videos each</u></strong> for Horizontal and Vertical, totaling <strong>20–30</strong> videos.</li>
+              <li id="instr-en-step5-en"><strong>Target Count:</strong> Please complete watching and rating <strong><u>20–30 videos</u></strong> for Horizontal video.</li>
               <li><strong>Submit:</strong> Once finished, return to the module selection page and click the <strong>"Finish"</strong> button in the top-right corner.</li>
             </ol>
           </div>
