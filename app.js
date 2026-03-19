@@ -2,7 +2,7 @@
 // Config — update VIDEO_BASE_URL to wherever your videos are hosted
 // ============================================================
 const VIDEO_BASE_URL = 'https://pub-4740265da8d444f58e0cfbce5100463d.r2.dev';
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbySRQocJmZaOOGNV5aptT5B1knkaD9bBmQAT7Au3sMKBxlD5ek5j6lFoMw86hmQkUzq/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwnYkVNsDB1eyqwsfnWkcFdpHuWtlnUU54H0qcx1LovYjEpT0h7yEf3_Qne8Q3eaBud/exec';
 // Maps internal language code → folder name in R2 bucket
 const VIDEO_FOLDER = { ZH: 'a-CH', EN: 'a-EN' };
 
@@ -817,7 +817,12 @@ function submitSurvey() {
   localStorage.setItem('surveyData', JSON.stringify(surveyData));
 
   const preferences = getPreferences().filter(p => p.user_id === currentUser);
-  const payload = { preferences, survey: surveyData };
+  const payload = {
+    preferences,
+    survey: surveyData,
+    user_language: userLang || 'unknown',
+    can_view_chinese: canViewChinese
+  };
 
   const submitBtn = document.querySelector('.btn-survey-submit');
   submitBtn.disabled = true;
