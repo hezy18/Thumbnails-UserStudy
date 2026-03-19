@@ -743,35 +743,21 @@ function submitSurvey() {
   submitBtn.disabled = true;
   submitBtn.textContent = userLang === 'ZH' ? '提交中…' : 'Submitting…';
 
-  // Send data to Google Sheets via hidden form to handle 302 redirects reliably
-  try {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = SHEETS_URL;
-    form.target = '_blank_sheet_submit';
-    form.style.display = 'none';
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'payload';
-    input.value = JSON.stringify(payload);
-    form.appendChild(input);
-    // Create a hidden iframe so form submission doesn't navigate away
-    let iframe = document.getElementById('_sheet_iframe');
-    if (!iframe) {
-      iframe = document.createElement('iframe');
-      iframe.name = '_blank_sheet_submit';
-      iframe.id = '_sheet_iframe';
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
-    }
-    document.body.appendChild(form);
-    form.submit();
-    form.remove();
-  } catch (e) {
-    console.warn('Google Sheets submission error:', e);
-  }
+  // Send data to Google Sheets — no-cors POST delivers the body before the 302 redirect
+  fetch(SHEETS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  })
+    .then(() => {
+      console.log('Google Sheets submission sent (no-cors, cannot verify response)');
+    })
+    .catch(err => {
+      console.warn('Google Sheets submission error:', err);
+    });
 
-  // Always show success — user will also export data as backup
+  // Show success immediately — no-cors responses are opaque so we can't wait for confirmation
   document.getElementById('survey-form').style.display = 'none';
   document.getElementById('survey-success').style.display = '';
   // Update finish buttons to reflect completion
