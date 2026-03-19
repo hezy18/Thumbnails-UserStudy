@@ -382,9 +382,14 @@
         <div class="survey-success-msg">
           <h2>Submission Successful!</h2>
           <p>Thank you for your cooperation!</p>
+          <p style="margin-top:12px;color:#d35400;font-weight:bold;">Please click "Export" below to download your data, then send the file to the Experimenter.</p>
           <h2>提交成功！</h2>
           <p>感谢您的配合！</p>
-          <button class="btn btn-primary" onclick="closeSurvey()" style="margin-top:24px">Close / 关闭</button>
+          <p style="margin-top:12px;color:#d35400;font-weight:bold;">请点击下方"Export"按钮导出数据，然后将文件发送给实验负责人。</p>
+          <div style="margin-top:24px;display:flex;gap:12px;justify-content:center;">
+            <button class="btn btn-success" onclick="exportData()">Export / 导出数据</button>
+            <button class="btn btn-primary" onclick="closeSurvey()">Close / 关闭</button>
+          </div>
         </div>
       </div>
     </div>
