@@ -17,7 +17,6 @@ let currentVideoA = null;      // video id being rated
 let currentLangA = 'ZH';       // selected language for Module A ('ZH' or 'EN')
 let videoListA = { ZH: [], EN: [] }; // filenames loaded from manifest
 let watchMaxPos = 0;           // furthest playback position reached (seconds)
-let verticalCoverMode = '916'; // '169' (horizontal default) or '916' (vertical) for ZH grid
 let instrLang = 'en';          // instruction page language ('en' or 'zh')
 let userLang = null;           // user's selected language ('ZH' or 'EN')
 let currentVideoB = null;      // video id in module B
@@ -280,18 +279,6 @@ function switchLangA(lang) {
   renderModuleA();
 }
 
-function toggleCoverLayout() {
-  verticalCoverMode = verticalCoverMode === '916' ? '169' : '916';
-  const btn = document.getElementById('btn-cover-toggle');
-  if (verticalCoverMode === '916') {
-    btn.innerHTML = 'Cover: 16:9 / <strong>9:16</strong>';
-  } else {
-    btn.innerHTML = 'Cover: <strong>16:9</strong> / 9:16';
-  }
-  const grid = document.getElementById('grid-a');
-  grid.classList.toggle('vertical-layout', verticalCoverMode === '916');
-}
-
 function renderModuleA() {
   const grid = document.getElementById('grid-a');
   grid.innerHTML = '';
@@ -301,15 +288,8 @@ function renderModuleA() {
     t.classList.toggle('active', t.dataset.lang === currentLangA);
   });
 
-  // Show cover toggle only on vertical (ZH) tab; apply vertical layout
-  const coverBtn = document.getElementById('btn-cover-toggle');
-  if (currentLangA === 'ZH') {
-    coverBtn.style.display = '';
-    grid.classList.toggle('vertical-layout', verticalCoverMode === '916');
-  } else {
-    coverBtn.style.display = 'none';
-    grid.classList.remove('vertical-layout');
-  }
+  // Vertical (ZH) tab uses 9:16 layout; Horizontal (EN) uses default 16:9
+  grid.classList.toggle('vertical-layout', currentLangA === 'ZH');
 
   const vids = videoListA[currentLangA];
   const prefs = getPreferences().filter(p => p.user_id === currentUser && p.language === currentLangA);
@@ -529,7 +509,7 @@ function finishStudy() {
 const SURVEY_TEXT = {
   EN: {
     title: 'Post-Study Survey',
-    intro: 'Please answer the following questions. It should take less than 1 minute.',
+    intro: 'Please answer the following questions. It should take less than 2 minute.',
     q1: 'Q1. Thinking back to the videos you rated highly (or liked), what attracted you the most? (Multiple choice)',
     q1a: 'Outstanding cover visuals: beautiful composition, comfortable colors, or clear image quality',
     q1b: 'Catchy title/text: the copy hits a pain point, or creates strong suspense',
@@ -580,7 +560,7 @@ const SURVEY_TEXT = {
   },
   ZH: {
     title: '实验后简短调研',
-    intro: '请您回答以下问题，所需时间不超过1分钟。',
+    intro: '请您回答以下问题，所需时间不超过2分钟。',
     q1: '1. 回想刚才您打高分（或选择喜欢）的视频，最吸引您的原因是？（多选）',
     q1a: '封面视觉出众：构图美观、色彩舒适或画质清晰',
     q1b: '标题/文字抓人：文案直击痛点，或者产生了强烈的悬念',

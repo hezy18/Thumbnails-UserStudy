@@ -157,11 +157,6 @@ body {
   padding: 8px 10px; font-size: 13px; text-align: center;
 }
 .video-card.rated .card-label { color: #27ae60; font-weight: 600; }
-.btn-cover-toggle {
-  background: #f0f0f0; color: #333; border: 1px solid #ccc;
-  font-size: 12px; padding: 4px 10px; margin-left: 8px;
-}
-.btn-cover-toggle:hover { background: #e0e0e0; }
 
 /* Player page */
 .player-section { max-width: 900px; margin: 0 auto; }
