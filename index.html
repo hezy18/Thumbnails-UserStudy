@@ -315,21 +315,21 @@
     </div>
   </div>
 
-  <!-- MODULE B: Thumbnail Selection (pick 2) -->
+  <!-- MODULE B: Thumbnail Selection (pick 3) -->
   <div id="view-thumb-select" class="view">
     <div class="header">
       <div class="header-left">
         <h2 id="thumb-title">Choose Thumbnails</h2>
       </div>
       <div class="header-right">
-        <span id="thumb-select-count">0 / 2 selected</span>
+        <span id="thumb-select-count">0 / 3 selected</span>
         <button id="btn-confirm-thumb" class="btn btn-primary" onclick="confirmThumbSelection()" disabled>Confirm / 确认</button>
         <button class="btn btn-secondary" onclick="showView('view-module-b')">Back / 返回</button>
       </div>
     </div>
     <div class="content">
       <div class="thumb-selection">
-        <h3>Select the 2 covers you like most / 选出您最喜欢的 2 个封面</h3>
+        <h3>Select the 3 covers you like most / 选出您最喜欢的 3 个封面</h3>
         <div id="thumb-grid" class="thumb-grid"></div>
       </div>
     </div>
@@ -352,15 +352,22 @@
         </video>
       </div>
       <div class="questionnaire">
-        <h3>How well does the video content match your expectations based on the covers you chose?</h3>
-        <p style="color:#666;font-size:14px;margin-bottom:16px;">视频内容与你基于封面产生的预期匹配度如何？</p>
-        <div id="match-options" class="match-options">
-          <label class="survey-opt"><input type="radio" name="match" value="highly_consistent"><span>A. Highly consistent / 高度符合</span></label>
-          <label class="survey-opt"><input type="radio" name="match" value="somewhat_consistent"><span>B. Somewhat consistent / 比较符合</span></label>
-          <label class="survey-opt"><input type="radio" name="match" value="different"><span>C. Different from expected / 与预期不同</span></label>
-          <label class="survey-opt"><input type="radio" name="match" value="completely_different"><span>D. Completely different / 完全不同</span></label>
+        <div class="match-question-layout">
+          <div class="match-cover-preview">
+            <img id="match-cover-img" src="" alt="Selected Cover" />
+          </div>
+          <div class="match-question-content">
+            <h3>How well does the video content match your expectations based on the cover you chose?</h3>
+            <p style="color:#666;font-size:14px;margin-bottom:16px;">视频内容与你基于这个封面产生的预期匹配度如何？</p>
+            <div id="match-options" class="match-options">
+              <label class="survey-opt"><input type="radio" name="match" value="highly_consistent"><span>A. Highly consistent / 高度符合</span></label>
+              <label class="survey-opt"><input type="radio" name="match" value="somewhat_consistent"><span>B. Somewhat consistent / 比较符合</span></label>
+              <label class="survey-opt"><input type="radio" name="match" value="different"><span>C. Different from expected / 与预期不同</span></label>
+              <label class="survey-opt"><input type="radio" name="match" value="completely_different"><span>D. Completely different / 完全不同</span></label>
+            </div>
+            <button class="btn btn-primary" onclick="submitVideoBAnswer()" style="margin-top:16px">Next Case / 下一个案例</button>
+          </div>
         </div>
-        <button class="btn btn-primary" onclick="submitVideoBAnswer()" style="margin-top:16px">Next Case / 下一个案例</button>
       </div>
     </div>
   </div>

@@ -235,12 +235,15 @@ body {
 .task-status.pending { background: #fef3cd; color: #856404; }
 .task-status.done { background: #d4edda; color: #155724; }
 
-/* Thumbnail grid (6 options) */
-.thumb-selection { max-width: 1200px; margin: 0 auto; }
+/* Thumbnail grid (10 options, 5 per row) */
+.thumb-selection { max-width: 1400px; margin: 0 auto; }
 .thumb-selection h3 { margin-bottom: 16px; font-size: 18px; }
 .thumb-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px;
 }
+/* Default portrait aspect ratio (9:16); overridden to 16:9 for landscape-dominant sets */
+.thumb-grid .thumb-option { aspect-ratio: 9 / 16; }
+.thumb-grid.landscape-grid .thumb-option { aspect-ratio: 16 / 9; }
 .thumb-option {
   position: relative; cursor: pointer; border-radius: 8px;
   overflow: hidden; border: 3px solid transparent;
@@ -250,22 +253,44 @@ body {
 .thumb-option.selected { border-color: #27ae60; box-shadow: 0 0 12px rgba(39, 174, 96, 0.5); }
 .thumb-option.selected .option-label { background: rgba(39, 174, 96, 0.85); }
 .thumb-option img {
-  width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
-  background: #ddd;
+  width: 100%; height: 100%; object-fit: contain; display: block;
+  background: #000;
 }
 .thumb-option .option-label {
   position: absolute; top: 6px; left: 6px;
   background: rgba(0,0,0,0.6); color: #fff;
   padding: 2px 8px; border-radius: 4px; font-size: 12px;
 }
+.pick-badge {
+  position: absolute; top: 6px; right: 6px;
+  background: #27ae60; color: #fff;
+  width: 24px; height: 24px; border-radius: 50%;
+  font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2;
+}
 
 /* Questionnaire */
 .questionnaire {
-  max-width: 600px; margin: 20px auto 0;
+  max-width: 860px; margin: 20px auto 0;
   background: #fff; padding: 24px; border-radius: 10px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 .questionnaire h3 { margin-bottom: 16px; }
+
+/* Match question layout: cover on left, question on right */
+.match-question-layout {
+  display: flex; gap: 24px; align-items: flex-start;
+}
+.match-cover-preview {
+  flex-shrink: 0; width: 180px;
+}
+.match-cover-preview img {
+  width: 100%; border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  display: block; background: #000;
+}
+.match-question-content { flex: 1; }
 .q-item { margin-bottom: 18px; }
 .q-item label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; }
 
