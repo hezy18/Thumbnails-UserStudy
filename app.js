@@ -1016,7 +1016,7 @@ function renderModuleB() {
     const item = document.createElement('div');
     item.className = 'task-item' + (done ? ' completed' : '');
     item.innerHTML = `
-      <span class="task-label">Case ${i + 1}: Video ${vid}</span>
+      <span class="task-label">Case ${i + 1}</span>
       <span class="task-status ${done ? 'done' : 'pending'}">${done ? 'Completed' : 'Pending'}</span>
     `;
     item.onclick = () => openThumbSelect(vid);
@@ -1033,7 +1033,7 @@ function openThumbSelect(vid) {
   const caseIdx = vids.indexOf(vid) + 1;
   const folder = getThumbFolder(vid);
   const files = getThumbFiles(folder, currentUser, vid);
-  document.getElementById('thumb-title').textContent = `Case ${caseIdx}/${vids.length}: Video ${vid}`;
+  document.getElementById('thumb-title').textContent = `Case ${caseIdx}/${vids.length}`;
 
   const grid = document.getElementById('thumb-grid');
   grid.innerHTML = '';
@@ -1107,7 +1107,7 @@ function confirmThumbSelection() {
   const responses = getResponses().filter(r => r.user_id === currentUser);
   const doneCount = responses.length; // current (before this one is saved)
 
-  document.getElementById('video-b-title').textContent = `Case ${caseIdx}/${vids.length}: Video ${currentVideoB}`;
+  document.getElementById('video-b-title').textContent = `Case ${caseIdx}/${vids.length}`;
   const progEl = document.getElementById('b-progress-video');
   if (progEl) progEl.textContent = `${doneCount} / ${vids.length}`;
 
