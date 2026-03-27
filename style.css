@@ -111,7 +111,7 @@ body {
 .module-card p { color: #666; font-size: 14px; line-height: 1.5; }
 
 /* Content area */
-.content { padding: 24px 30px; max-width: 1200px; margin: 0 auto; }
+.content { padding: 24px 30px; max-width: 1000px; margin: 0 auto; }
 .back-link {
   display: inline-block; margin-bottom: 20px; color: #4a90d9;
   cursor: pointer; font-size: 14px;
@@ -236,7 +236,7 @@ body {
 .task-status.done { background: #d4edda; color: #155724; }
 
 /* Thumbnail grid (10 options, 5 per row) */
-.thumb-selection { max-width: 1400px; margin: 0 auto; }
+.thumb-selection { max-width: 1000px; margin: 0 auto; }
 .thumb-selection h3 { margin-bottom: 16px; font-size: 18px; }
 .thumb-grid {
   display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px;
