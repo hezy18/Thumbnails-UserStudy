@@ -1019,7 +1019,7 @@ function renderModuleB() {
       <span class="task-label">Case ${i + 1}: Video ${vid}</span>
       <span class="task-status ${done ? 'done' : 'pending'}">${done ? 'Completed' : 'Pending'}</span>
     `;
-    if (!done) item.onclick = () => openThumbSelect(vid);
+    item.onclick = () => openThumbSelect(vid);
     list.appendChild(item);
   });
 }

@@ -227,7 +227,7 @@ body {
   cursor: pointer; transition: background 0.15s;
 }
 .task-item:hover { background: #f7f9fc; }
-.task-item.completed { opacity: 0.6; }
+.task-item.completed { opacity: 0.85; }
 .task-item .task-label { font-size: 15px; font-weight: 500; }
 .task-status {
   padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
