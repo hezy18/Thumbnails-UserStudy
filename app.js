@@ -899,7 +899,7 @@ const THUMB_FILES_ZH_DEFAULT = [
 ];
 const THUMB_FILES_EN_DEFAULT = [
   'best_extra_high.jpg', 'best_high.jpg', 'best_low.jpg', 'best_medium.jpg',
-  'best_ori.jpg', 'initial.jpg', 'PosterO.jpg',
+  'best_ori.jpg', 'hpcvtg.jpg', 'initial.jpg', 'PosterO.jpg',
   'shot0002_klive.jpg', 'shot0003_showme.jpg', 'shot0006_hecate.jpg'
 ];
 
