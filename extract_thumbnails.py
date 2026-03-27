@@ -44,10 +44,10 @@ def extract_thumbnails(video_dir: Path, thumb_dir: Path):
 if __name__ == "__main__":
     base = Path(__file__).parent
 
-    langs = sys.argv[1:] if sys.argv[1:] else ["CH", "EN"]
+    folders = sys.argv[1:] if sys.argv[1:] else ["a-CH", "a-EN"]
 
-    for lang in langs:
-        video_dir = base / f"videos/a-{lang}"
-        thumb_dir = base / f"thumbnail/a-{lang}"
-        print(f"\n=== {lang}: {video_dir} -> {thumb_dir} ===")
+    for folder in folders:
+        video_dir = base / f"videos/{folder}"
+        thumb_dir = base / f"thumbnail/{folder}"
+        print(f"\n=== {folder}: {video_dir} -> {thumb_dir} ===")
         extract_thumbnails(video_dir, thumb_dir)

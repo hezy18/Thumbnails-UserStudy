@@ -21,8 +21,7 @@ let instrLang = 'en';          // instruction page language ('en' or 'zh')
 let userLang = null;           // user's selected language ('ZH' or 'EN')
 let canViewChinese = false;    // EN user can understand Chinese videos
 let currentVideoB = null;      // video id in module B
-let selectedThumb = null;      // chosen thumbnail (1-6)
-let ratingsB = { quality: 0, relevance: 0, preference: 0 };
+let selectedThumbs = [];       // chosen thumbnails (array of filenames, max 2)
 
 // ============================================================
 // Thumbnail capture queue (sequential canvas capture fallback)
@@ -855,13 +854,32 @@ function submitSurvey() {
 // ============================================================
 // Module B
 // ============================================================
+
+// Determine thumbnail folder based on video id (numeric → b-ZH, otherwise → b-EN)
+function getThumbFolder(vid) {
+  return /^\d+$/.test(vid) ? 'b-ZH' : 'b-EN';
+}
+
+// Known thumbnail filenames per folder type
+const THUMB_FILES_ZH = [
+  'best_extra_high.jpg', 'best_high.jpg', 'best_low.jpg', 'best_medium.jpg',
+  'best_ori.jpg', 'hpcvtg.jpg', 'initial.jpg', 'PosterO.jpg',
+  'shot0002_klive.jpg', 'shot0003_showme.jpg', 'shot0006_hecate.jpg'
+];
+const THUMB_FILES_EN = [
+  'best_extra_high.jpg', 'best_high.jpg', 'best_low.jpg', 'best_medium.jpg',
+  'best_ori.jpg', 'initial.jpg', 'PosterO.jpg',
+  'shot0002_klive.jpg', 'shot0003_showme.jpg', 'shot0006_hecate.jpg'
+];
+
 function renderModuleB() {
   const list = document.getElementById('task-list-b');
   list.innerHTML = '';
 
   const vids = assignments[currentUser] || [];
   if (vids.length === 0) {
-    list.innerHTML = '<p style="text-align:center;color:#999;padding:40px">No videos assigned to this user. Check data/assignments.txt.</p>';
+    list.innerHTML = '<p style="text-align:center;color:#999;padding:40px">No assignments available for your account.</p>';
+    document.getElementById('b-progress').textContent = 'N/A';
     return;
   }
 
@@ -885,80 +903,70 @@ function renderModuleB() {
 
 function openThumbSelect(vid) {
   currentVideoB = vid;
-  selectedThumb = null;
-  document.getElementById('thumb-title').textContent = 'Video ' + vid + ' — Choose a Thumbnail';
+  selectedThumbs = [];
+  updateThumbSelectUI();
+
+  const folder = getThumbFolder(vid);
+  const files = folder === 'b-ZH' ? THUMB_FILES_ZH : THUMB_FILES_EN;
+  document.getElementById('thumb-title').textContent = 'Video ' + vid + ' — Select 2 Thumbnails';
 
   const grid = document.getElementById('thumb-grid');
   grid.innerHTML = '';
 
-  for (let i = 1; i <= 6; i++) {
+  // Shuffle (Fisher-Yates)
+  const shuffled = [...files];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  shuffled.forEach((file, idx) => {
+    const src = `thumbnail/${folder}/${currentUser}/${vid}/${file}`;
     const opt = document.createElement('div');
     opt.className = 'thumb-option';
+    opt.dataset.file = file;
     opt.innerHTML = `
-      <span class="option-label">Option ${i}</span>
-      <div class="placeholder-thumb">Thumb ${vid}-${i}</div>
+      <span class="option-label">${idx + 1}</span>
+      <img src="${src}" alt="Thumbnail ${idx + 1}" onerror="this.style.background='#ccc';this.alt='Image not found';">
     `;
-    opt.onclick = () => selectThumbnail(vid, i);
+    opt.onclick = () => toggleThumbSelection(opt, file);
     grid.appendChild(opt);
-  }
+  });
 
   showView('view-thumb-select');
 }
 
-function selectThumbnail(vid, thumbIdx) {
-  selectedThumb = thumbIdx;
-  document.getElementById('player-b-title').textContent = 'Video ' + vid + ' (Thumbnail ' + thumbIdx + ')';
-
-  const videoEl = document.getElementById('video-b');
-  videoEl.querySelector('source').src = `videos/b/video_${vid}.mp4`;
-  videoEl.load();
-
-  // Reset questionnaire stars
-  ratingsB = { quality: 0, relevance: 0, preference: 0 };
-  buildStars('stars-b-quality', val => { ratingsB.quality = val; });
-  buildStars('stars-b-relevance', val => { ratingsB.relevance = val; });
-  buildStars('stars-b-preference', val => { ratingsB.preference = val; });
-
-  showView('view-player-b');
+function toggleThumbSelection(opt, file) {
+  const idx = selectedThumbs.indexOf(file);
+  if (idx >= 0) {
+    // Deselect
+    selectedThumbs.splice(idx, 1);
+    opt.classList.remove('selected');
+  } else if (selectedThumbs.length < 2) {
+    // Select
+    selectedThumbs.push(file);
+    opt.classList.add('selected');
+  }
+  updateThumbSelectUI();
 }
 
-function submitQuestionnaireB() {
-  if (ratingsB.quality === 0 || ratingsB.relevance === 0 || ratingsB.preference === 0) {
-    alert('Please fill in all three ratings.');
-    return;
-  }
+function updateThumbSelectUI() {
+  const countEl = document.getElementById('thumb-select-count');
+  const btn = document.getElementById('btn-confirm-thumb');
+  if (countEl) countEl.textContent = `${selectedThumbs.length} / 2 selected`;
+  if (btn) btn.disabled = selectedThumbs.length !== 2;
+}
+
+function confirmThumbSelection() {
+  if (selectedThumbs.length !== 2) return;
   saveResponse({
     user_id: currentUser,
     video_id: currentVideoB,
-    selected_thumbnail: selectedThumb,
-    score_quality: ratingsB.quality,
-    score_relevance: ratingsB.relevance,
-    score_preference: ratingsB.preference,
+    selected_thumbnail_1: selectedThumbs[0],
+    selected_thumbnail_2: selectedThumbs[1],
     timestamp: new Date().toISOString()
   });
   showView('view-module-b');
-}
-
-// ============================================================
-// Star rating component
-// ============================================================
-function buildStars(containerId, onChange) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = '';
-  let current = 0;
-  for (let i = 1; i <= 5; i++) {
-    const star = document.createElement('span');
-    star.className = 'star';
-    star.textContent = '\u2605';
-    star.onclick = () => {
-      current = i;
-      onChange(i);
-      container.querySelectorAll('.star').forEach((s, idx) => {
-        s.classList.toggle('active', idx < i);
-      });
-    };
-    container.appendChild(star);
-  }
 }
 
 // ============================================================
@@ -976,9 +984,9 @@ function exportData() {
   });
 
   text += '\n=== EXPERIMENT RESPONSES (Module B) ===\n';
-  text += 'user_id\tvideo_id\tselected_thumbnail\tscore_quality\tscore_relevance\tscore_preference\ttimestamp\n';
+  text += 'user_id\tvideo_id\tselected_thumbnail_1\tselected_thumbnail_2\ttimestamp\n';
   resps.forEach(r => {
-    text += `${r.user_id}\t${r.video_id}\t${r.selected_thumbnail}\t${r.score_quality}\t${r.score_relevance}\t${r.score_preference}\t${r.timestamp}\n`;
+    text += `${r.user_id}\t${r.video_id}\t${r.selected_thumbnail_1 || r.selected_thumbnail || ''}\t${r.selected_thumbnail_2 || ''}\t${r.timestamp}\n`;
   });
 
   text += '\n=== POST-STUDY SURVEY ===\n';

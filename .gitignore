@@ -6,4 +6,9 @@ a-EN.zip
 org_thumbnails.zip
 data/users_backup.txt
 data/assignments_backup.txt
-data/assignments.txt
+data/assignments_backup.txt
+org_thumbnails/
+fetch_hf_*.py
+fetch_local_thumbnails.py
+copy_hecate_thumbnails.py
+extract_thumbnails.py

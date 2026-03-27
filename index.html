@@ -157,12 +157,12 @@
             <span class="card-cn">浏览短视频，根据您的兴趣程度对每个视频进行评分。</span>
           </p>
         </div>
-        <div class="module-card" onclick="showView('view-module-b')">
+        <div id="module-b-card" class="module-card" onclick="showView('view-module-b')">
           <h3>Module B &nbsp;<span class="card-title-cn">模块 B</span></h3>
           <p>
             <strong>Thumbnail Selection</strong> / <strong>封面选择</strong><br><br>
-            Pick from 6 thumbnail options, watch the video, and fill out a short questionnaire.<br>
-            <span class="card-cn">从 6 个封面选项中选择，观看视频并填写问卷。</span>
+            View thumbnails for each video and pick your top 2 choices.<br>
+            <span class="card-cn">查看每个视频的封面缩略图，选择您最喜欢的 2 个。</span>
           </p>
         </div>
       </div>
@@ -262,55 +262,22 @@
     </div>
   </div>
 
-  <!-- MODULE B: Thumbnail Selection -->
+  <!-- MODULE B: Thumbnail Selection (pick 2) -->
   <div id="view-thumb-select" class="view">
     <div class="header">
       <div class="header-left">
-        <h2 id="thumb-title">Choose a Thumbnail</h2>
+        <h2 id="thumb-title">Choose Thumbnails</h2>
       </div>
       <div class="header-right">
-        <button class="btn btn-secondary" onclick="showView('view-module-b')">Back</button>
+        <span id="thumb-select-count">0 / 2 selected</span>
+        <button id="btn-confirm-thumb" class="btn btn-primary" onclick="confirmThumbSelection()" disabled>Confirm / 确认</button>
+        <button class="btn btn-secondary" onclick="showView('view-module-b')">Back / 返回</button>
       </div>
     </div>
     <div class="content">
       <div class="thumb-selection">
-        <h3>Click the thumbnail you prefer to start watching</h3>
+        <h3>Select 2 thumbnails you prefer / 选择您最喜欢的 2 个封面</h3>
         <div id="thumb-grid" class="thumb-grid"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODULE B: Video + Questionnaire -->
-  <div id="view-player-b" class="view">
-    <div class="header">
-      <div class="header-left">
-        <h2 id="player-b-title">Video</h2>
-      </div>
-      <div class="header-right">
-        <button class="btn btn-secondary" onclick="showView('view-module-b')">Back</button>
-      </div>
-    </div>
-    <div class="content">
-      <div class="player-section">
-        <video id="video-b" controls>
-          <source src="" type="video/mp4">
-        </video>
-      </div>
-      <div class="questionnaire">
-        <h3>Post-Viewing Questionnaire</h3>
-        <div class="q-item">
-          <label>1. Cover visual quality (1–5)</label>
-          <div id="stars-b-quality" class="star-rating"></div>
-        </div>
-        <div class="q-item">
-          <label>2. Cover relevance to video content (1–5)</label>
-          <div id="stars-b-relevance" class="star-rating"></div>
-        </div>
-        <div class="q-item">
-          <label>3. Video content preference (1–5)</label>
-          <div id="stars-b-preference" class="star-rating"></div>
-        </div>
-        <button class="btn btn-primary" onclick="submitQuestionnaireB()">Submit</button>
       </div>
     </div>
   </div>

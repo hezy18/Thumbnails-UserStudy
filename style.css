@@ -236,10 +236,10 @@ body {
 .task-status.done { background: #d4edda; color: #155724; }
 
 /* Thumbnail grid (6 options) */
-.thumb-selection { max-width: 900px; margin: 0 auto; }
+.thumb-selection { max-width: 1200px; margin: 0 auto; }
 .thumb-selection h3 { margin-bottom: 16px; font-size: 18px; }
 .thumb-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;
 }
 .thumb-option {
   position: relative; cursor: pointer; border-radius: 8px;
@@ -247,6 +247,8 @@ body {
   transition: border-color 0.2s, transform 0.15s;
 }
 .thumb-option:hover { border-color: #4a90d9; transform: scale(1.02); }
+.thumb-option.selected { border-color: #27ae60; box-shadow: 0 0 12px rgba(39, 174, 96, 0.5); }
+.thumb-option.selected .option-label { background: rgba(39, 174, 96, 0.85); }
 .thumb-option img {
   width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
   background: #ddd;
