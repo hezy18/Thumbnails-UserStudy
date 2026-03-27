@@ -2,7 +2,7 @@
 // Config — update VIDEO_BASE_URL to wherever your videos are hosted
 // ============================================================
 const VIDEO_BASE_URL = 'https://pub-4740265da8d444f58e0cfbce5100463d.r2.dev';
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwnYkVNsDB1eyqwsfnWkcFdpHuWtlnUU54H0qcx1LovYjEpT0h7yEf3_Qne8Q3eaBud/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyJAwi841OeTZjUT2PIpNcOjjs6e81avLS2Yaea_7a0Z8ep8trUCIRTH5ux8g-VS-_5/exec';
 // Maps internal language code → folder name in R2 bucket
 const VIDEO_FOLDER = { ZH: 'a-CH', EN: 'a-EN' };
 
@@ -78,13 +78,23 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (saved) {
     currentUser = saved;
     syncUserLabels(currentUser);
+
+    // Module B user: skip language selection entirely
+    if (isModuleBUser(currentUser)) {
+      if (localStorage.getItem('instrSeenB')) {
+        showView('view-module-b');
+      } else {
+        showView('view-instr-b');
+      }
+      return;
+    }
+
     const savedLang = localStorage.getItem('userLang');
     if (savedLang) {
       userLang = savedLang;
       currentLangA = savedLang === 'ZH' ? 'ZH' : 'EN';
       instrLang = savedLang === 'ZH' ? 'zh' : 'en';
       canViewChinese = localStorage.getItem('canViewChinese') === '1';
-      // Skip instructions on return visits — go straight to Module A
       if (localStorage.getItem('instrSeen')) {
         showView('view-module-a');
       } else {
@@ -182,6 +192,7 @@ function showView(id) {
 
   // Hooks when entering views
   if (id === 'view-instructions') { switchInstrLang(instrLang); initInstrButton(); }
+  if (id === 'view-instr-b') initInstrBButton();
   if (id === 'view-dashboard') updateFinishBtn();
   if (id === 'view-module-a') { renderModuleA(); updateModuleAFinishBtn(); }
   if (id === 'view-module-b') renderModuleB();
@@ -206,7 +217,15 @@ function doLogin() {
   currentUser = uid;
   localStorage.setItem('currentUser', uid);
   syncUserLabels(uid);
-  showView('view-lang-select');
+  if (isModuleBUser(uid)) {
+    showView('view-instr-b');
+  } else {
+    showView('view-lang-select');
+  }
+}
+
+function isModuleBUser(uid) {
+  return assignments.hasOwnProperty(uid) && assignments[uid].length > 0;
 }
 
 function doLogout() {
@@ -219,6 +238,7 @@ function doLogout() {
   localStorage.removeItem('userLang');
   localStorage.removeItem('canViewChinese');
   localStorage.removeItem('instrSeen');
+  localStorage.removeItem('instrSeenB');
   document.getElementById('input-uid').value = '';
   document.getElementById('input-pwd').value = '';
   toggleSignUp(false);
@@ -280,7 +300,11 @@ function doSignUp() {
   currentUser = uid;
   localStorage.setItem('currentUser', uid);
   syncUserLabels(uid);
-  showView('view-lang-select');
+  if (isModuleBUser(uid)) {
+    showView('view-instr-b');
+  } else {
+    showView('view-lang-select');
+  }
 }
 
 function selectLang(lang) {
@@ -311,7 +335,7 @@ function setChinese(canView) {
 }
 
 function syncUserLabels(uid) {
-  document.querySelectorAll('#user-label, #user-label-instr').forEach(el => {
+  document.querySelectorAll('#user-label, #user-label-instr, #user-label-instr-b').forEach(el => {
     el.textContent = uid;
   });
 }
@@ -860,6 +884,12 @@ function getThumbFolder(vid) {
   return /^\d+$/.test(vid) ? 'b-ZH' : 'b-EN';
 }
 
+// Get video URL for Module B
+function getVideoBUrl(vid) {
+  const folder = /^\d+$/.test(vid) ? 'a-CH' : 'a-EN';
+  return `${VIDEO_BASE_URL}/${folder}/${vid}.mp4`;
+}
+
 // Known thumbnail filenames per folder type
 const THUMB_FILES_ZH = [
   'best_extra_high.jpg', 'best_high.jpg', 'best_low.jpg', 'best_medium.jpg',
@@ -872,13 +902,44 @@ const THUMB_FILES_EN = [
   'shot0002_klive.jpg', 'shot0003_showme.jpg', 'shot0006_hecate.jpg'
 ];
 
+// Module B instruction page countdown
+let instrBTimer = null;
+function initInstrBButton() {
+  const btn = document.getElementById('btn-enter-b');
+  if (instrBTimer) clearInterval(instrBTimer);
+  if (localStorage.getItem('instrSeenB')) {
+    btn.disabled = false;
+    btn.textContent = 'Confirm & Enter / 确认进入';
+    return;
+  }
+  btn.disabled = true;
+  let remaining = 10;
+  const update = () => {
+    btn.textContent = remaining > 0
+      ? `Please read the instructions (${remaining}s) / 请阅读说明 (${remaining}s)`
+      : 'Confirm & Enter / 确认进入';
+    btn.disabled = remaining > 0;
+  };
+  update();
+  instrBTimer = setInterval(() => {
+    remaining--;
+    update();
+    if (remaining <= 0) clearInterval(instrBTimer);
+  }, 1000);
+}
+
+function enterModuleB() {
+  localStorage.setItem('instrSeenB', '1');
+  showView('view-module-b');
+}
+
 function renderModuleB() {
   const list = document.getElementById('task-list-b');
   list.innerHTML = '';
 
   const vids = assignments[currentUser] || [];
   if (vids.length === 0) {
-    list.innerHTML = '<p style="text-align:center;color:#999;padding:40px">No assignments available for your account.</p>';
+    list.innerHTML = '<p style="text-align:center;color:#999;padding:40px">No assignments available for your account. / 暂无分配的视频案例。</p>';
     document.getElementById('b-progress').textContent = 'N/A';
     return;
   }
@@ -886,14 +947,23 @@ function renderModuleB() {
   const responses = getResponses().filter(r => r.user_id === currentUser);
   const doneSet = new Set(responses.map(r => r.video_id));
   const doneCount = vids.filter(v => doneSet.has(v)).length;
-  document.getElementById('b-progress').textContent = `${doneCount} / ${vids.length} completed`;
+  document.getElementById('b-progress').textContent = `${doneCount} / ${vids.length}`;
 
-  vids.forEach(vid => {
+  // Enable submit button when all done
+  const submitBtn = document.getElementById('btn-submit-b');
+  if (submitBtn) {
+    const allDone = doneCount === vids.length && vids.length > 0;
+    submitBtn.disabled = !allDone;
+    submitBtn.classList.toggle('btn-finish-ready', allDone);
+    submitBtn.textContent = allDone ? 'Submit / 提交' : `Submit (${doneCount}/${vids.length})`;
+  }
+
+  vids.forEach((vid, i) => {
     const done = doneSet.has(vid);
     const item = document.createElement('div');
     item.className = 'task-item' + (done ? ' completed' : '');
     item.innerHTML = `
-      <span class="task-label">Video ${vid}</span>
+      <span class="task-label">Case ${i + 1}: Video ${vid}</span>
       <span class="task-status ${done ? 'done' : 'pending'}">${done ? 'Completed' : 'Pending'}</span>
     `;
     if (!done) item.onclick = () => openThumbSelect(vid);
@@ -906,9 +976,11 @@ function openThumbSelect(vid) {
   selectedThumbs = [];
   updateThumbSelectUI();
 
+  const vids = assignments[currentUser] || [];
+  const caseIdx = vids.indexOf(vid) + 1;
   const folder = getThumbFolder(vid);
   const files = folder === 'b-ZH' ? THUMB_FILES_ZH : THUMB_FILES_EN;
-  document.getElementById('thumb-title').textContent = 'Video ' + vid + ' — Select 2 Thumbnails';
+  document.getElementById('thumb-title').textContent = `Case ${caseIdx}/${vids.length}: Video ${vid}`;
 
   const grid = document.getElementById('thumb-grid');
   grid.innerHTML = '';
@@ -927,6 +999,7 @@ function openThumbSelect(vid) {
     opt.dataset.file = file;
     opt.innerHTML = `
       <span class="option-label">${idx + 1}</span>
+      <span class="pick-badge" style="display:none"></span>
       <img src="${src}" alt="Thumbnail ${idx + 1}" onerror="this.style.background='#ccc';this.alt='Image not found';">
     `;
     opt.onclick = () => toggleThumbSelection(opt, file);
@@ -947,6 +1020,18 @@ function toggleThumbSelection(opt, file) {
     selectedThumbs.push(file);
     opt.classList.add('selected');
   }
+  // Update all pick badges
+  document.querySelectorAll('#thumb-grid .thumb-option').forEach(el => {
+    const badge = el.querySelector('.pick-badge');
+    const f = el.dataset.file;
+    const pickIdx = selectedThumbs.indexOf(f);
+    if (pickIdx >= 0) {
+      badge.textContent = pickIdx + 1;
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
+  });
   updateThumbSelectUI();
 }
 
@@ -959,14 +1044,99 @@ function updateThumbSelectUI() {
 
 function confirmThumbSelection() {
   if (selectedThumbs.length !== 2) return;
+
+  // Show video playback + question
+  const vids = assignments[currentUser] || [];
+  const caseIdx = vids.indexOf(currentVideoB) + 1;
+  const responses = getResponses().filter(r => r.user_id === currentUser);
+  const doneCount = responses.length; // current (before this one is saved)
+
+  document.getElementById('video-b-title').textContent = `Case ${caseIdx}/${vids.length}: Video ${currentVideoB}`;
+  const progEl = document.getElementById('b-progress-video');
+  if (progEl) progEl.textContent = `${doneCount} / ${vids.length}`;
+
+  const videoEl = document.getElementById('video-b');
+  videoEl.querySelector('source').src = getVideoBUrl(currentVideoB);
+  videoEl.load();
+
+  // Reset radio buttons
+  document.querySelectorAll('input[name="match"]').forEach(r => r.checked = false);
+
+  showView('view-video-b');
+}
+
+function submitVideoBAnswer() {
+  const match = document.querySelector('input[name="match"]:checked');
+  if (!match) {
+    alert('Please select an answer. / 请选择一个选项。');
+    return;
+  }
+
   saveResponse({
     user_id: currentUser,
     video_id: currentVideoB,
     selected_thumbnail_1: selectedThumbs[0],
     selected_thumbnail_2: selectedThumbs[1],
+    match_answer: match.value,
     timestamp: new Date().toISOString()
   });
+
+  // Pause video
+  document.getElementById('video-b').pause();
+
+  // Toast
+  const toast = document.getElementById('rating-toast');
+  toast.textContent = '✓ Saved / 已保存';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1200);
+
   showView('view-module-b');
+}
+
+// Submit all Module B data to Google Sheets + download txt
+function submitModuleB() {
+  const responses = getResponses().filter(r => r.user_id === currentUser);
+  const payload = { module_b: responses };
+
+  const btn = document.getElementById('btn-submit-b');
+  btn.disabled = true;
+  btn.textContent = 'Submitting... / 提交中...';
+
+  fetch(SHEETS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    console.log('Module B data sent to Google Sheets');
+  }).catch(err => {
+    console.warn('Module B sheets error:', err);
+  });
+
+  // Download txt
+  exportDataB();
+
+  // Show success
+  btn.textContent = 'Submitted ✓ / 已提交';
+  btn.classList.remove('btn-finish-ready');
+
+  alert('Submission successful! Your data file has been downloaded.\n提交成功！数据文件已下载。\n\nPlease send the file to the experimenter.\n请将文件发送给实验负责人。');
+}
+
+function exportDataB() {
+  const resps = getResponses().filter(r => r.user_id === currentUser);
+  let text = '=== MODULE B RESPONSES ===\n';
+  text += 'user_id\tvideo_id\tselected_thumbnail_1\tselected_thumbnail_2\tmatch_answer\ttimestamp\n';
+  resps.forEach(r => {
+    text += `${r.user_id}\t${r.video_id}\t${r.selected_thumbnail_1 || ''}\t${r.selected_thumbnail_2 || ''}\t${r.match_answer || ''}\t${r.timestamp}\n`;
+  });
+
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `module_b_${currentUser}_${new Date().toISOString().slice(0, 10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 // ============================================================

@@ -33,7 +33,7 @@
     </div>
   </div>
 
-  <!-- LANGUAGE SELECTION VIEW -->
+  <!-- LANGUAGE SELECTION VIEW (Module A users only) -->
   <div id="view-lang-select" class="view">
     <div class="login-container">
       <div class="login-box">
@@ -41,6 +41,56 @@
         <p class="lang-select-hint">Please select your language<br>请选择您的语言</p>
         <button class="lang-select-btn" onclick="selectLang('ZH')">中文 (Chinese)</button>
         <button class="lang-select-btn lang-select-btn-en" onclick="selectLang('EN')">English</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE B: Instructions -->
+  <div id="view-instr-b" class="view">
+    <div class="header">
+      <div class="header-left">
+        <h2>Module B — Instructions / 实验说明</h2>
+      </div>
+      <div class="header-right">
+        <span id="user-label-instr-b"></span>
+        <button class="btn btn-secondary" onclick="doLogout()">Logout</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="instr-container">
+        <div class="instr-body">
+          <h2>Thumbnail Selection Experiment / 封面选择实验</h2>
+          <p class="instr-intro">
+            You will see <strong>20 video cases</strong>. For each case, please select the <strong>two covers you like the most</strong> and would most like to click on.
+          </p>
+          <p class="instr-intro" style="color:#666">
+            您将看到 <strong>20 个视频案例</strong>。对于每个案例，请选出您<strong>最喜欢、最想点击的 2 个封面</strong>。
+          </p>
+
+          <div class="instr-section">
+            <h3>Steps / 操作步骤</h3>
+            <ol class="instr-steps">
+              <li><strong>Browse Covers:</strong> For each case, you will see 10 candidate cover images displayed in random order.<br>
+                <span style="color:#666">浏览封面：每个案例会以随机顺序展示 10 张候选封面图。</span></li>
+              <li><strong>Select Two:</strong> Click to select the <strong>2 covers</strong> that attract you the most. Your 1st and 2nd picks will be labeled with numbered badges.<br>
+                <span style="color:#666">选择两张：点击选出最吸引您的 <strong>2 张封面</strong>，系统会标注您的第 1 和第 2 选择。</span></li>
+              <li><strong>Confirm &amp; Watch:</strong> After selecting, click "Confirm" to proceed to a short video. Watch the video and answer one quick question about how well it matched your expectations.<br>
+                <span style="color:#666">确认并观看：选好后点击"确认"进入视频播放页，观看视频后回答一个关于封面与内容匹配度的问题。</span></li>
+              <li><strong>Repeat:</strong> Complete all 20 cases, then click "Submit" to finish.<br>
+                <span style="color:#666">重复操作：完成全部 20 个案例后，点击"提交"结束实验。</span></li>
+            </ol>
+          </div>
+
+          <div class="instr-goal">
+            <h3>Our Expectations / 我们的期望</h3>
+            <p>We want to understand which cover images genuinely attract your attention. There are no right or wrong answers — please choose based on your true preferences.<br>
+              <span style="color:#666">我们希望了解哪些封面图真正吸引您的注意力。答案没有对错之分，请根据您的真实喜好进行选择。</span></p>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-enter" id="btn-enter-b" onclick="enterModuleB()" disabled>
+          Please read the instructions (10s) / 请阅读说明 (10s)
+        </button>
       </div>
     </div>
   </div>
@@ -249,12 +299,14 @@
   <div id="view-module-b" class="view">
     <div class="header">
       <div class="header-left">
-        <button class="btn btn-outline-instr" onclick="showView('view-instructions')">&#128203; Instructions / 说明</button>
-        <h2>Module B — Thumbnail Experiment</h2>
+        <button class="btn btn-outline-instr" onclick="showView('view-instr-b')">&#128203; Instructions / 说明</button>
+        <h2>Module B — Thumbnail Experiment / 封面选择实验</h2>
       </div>
       <div class="header-right">
         <span id="b-progress"></span>
-        <button class="btn btn-secondary" onclick="showView('view-dashboard')">Back / 返回</button>
+        <button id="btn-submit-b" class="btn btn-finish" onclick="submitModuleB()" disabled>Submit / 提交</button>
+        <button class="btn btn-success btn-sm" onclick="exportDataB()">Export</button>
+        <button class="btn btn-secondary" onclick="doLogout()">Logout</button>
       </div>
     </div>
     <div class="content">
@@ -276,8 +328,38 @@
     </div>
     <div class="content">
       <div class="thumb-selection">
-        <h3>Select 2 thumbnails you prefer / 选择您最喜欢的 2 个封面</h3>
+        <h3>Select the 2 covers you like most / 选出您最喜欢的 2 个封面</h3>
         <div id="thumb-grid" class="thumb-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE B: Video Playback + Matching Question -->
+  <div id="view-video-b" class="view">
+    <div class="header">
+      <div class="header-left">
+        <h2 id="video-b-title">Video</h2>
+      </div>
+      <div class="header-right">
+        <span id="b-progress-video"></span>
+      </div>
+    </div>
+    <div class="content">
+      <div class="player-section">
+        <video id="video-b" controls>
+          <source src="" type="video/mp4">
+        </video>
+      </div>
+      <div class="questionnaire">
+        <h3>How well does the video content match your expectations based on the covers you chose?</h3>
+        <p style="color:#666;font-size:14px;margin-bottom:16px;">视频内容与你基于封面产生的预期匹配度如何？</p>
+        <div id="match-options" class="match-options">
+          <label class="survey-opt"><input type="radio" name="match" value="highly_consistent"><span>A. Highly consistent / 高度符合</span></label>
+          <label class="survey-opt"><input type="radio" name="match" value="somewhat_consistent"><span>B. Somewhat consistent / 比较符合</span></label>
+          <label class="survey-opt"><input type="radio" name="match" value="different"><span>C. Different from expected / 与预期不同</span></label>
+          <label class="survey-opt"><input type="radio" name="match" value="completely_different"><span>D. Completely different / 完全不同</span></label>
+        </div>
+        <button class="btn btn-primary" onclick="submitVideoBAnswer()" style="margin-top:16px">Next Case / 下一个案例</button>
       </div>
     </div>
   </div>
