@@ -886,7 +886,7 @@ function getThumbFolder(vid) {
 
 // Get video URL for Module B
 function getVideoBUrl(vid) {
-  const folder = /^\d+$/.test(vid) ? 'a-CH' : 'a-EN';
+  const folder = /^\d+$/.test(vid) ? 'b-CH' : 'b-EN';
   return `${VIDEO_BASE_URL}/${folder}/${vid}.mp4`;
 }
 
