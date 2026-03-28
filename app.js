@@ -208,8 +208,10 @@ function doLogin() {
   const pwd = document.getElementById('input-pwd').value.trim();
   const errEl = document.getElementById('login-error');
 
+  // Accept any password if the user ID exists in assignments
+  const inAssignments = uid in assignments;
   const user = users.find(u => u.id === uid && u.password === pwd);
-  if (!user) {
+  if (!user && !inAssignments) {
     errEl.textContent = 'Invalid User ID or Password';
     errEl.style.display = 'block';
     return;
@@ -1114,6 +1116,7 @@ function confirmThumbSelection() {
   const videoEl = document.getElementById('video-b');
   videoEl.querySelector('source').src = getVideoBUrl(currentVideoB);
   videoEl.load();
+  videoEl.currentTime = 0;
 
   // Show first selected cover in the post-video question panel
   const folder = getThumbFolder(currentVideoB);
@@ -1133,6 +1136,11 @@ function submitVideoBAnswer() {
     return;
   }
 
+  const videoEl = document.getElementById('video-b');
+  const watchedSec = Math.round(videoEl.currentTime);
+  const duration = isFinite(videoEl.duration) && videoEl.duration > 0 ? Math.round(videoEl.duration) : 0;
+  const completionPct = duration > 0 ? Math.round((watchedSec / duration) * 100) : 0;
+
   saveResponse({
     user_id: currentUser,
     video_id: currentVideoB,
@@ -1140,11 +1148,14 @@ function submitVideoBAnswer() {
     selected_thumbnail_2: selectedThumbs[1],
     selected_thumbnail_3: selectedThumbs[2],
     match_answer: match.value,
+    watch_duration_sec: watchedSec,
+    video_duration_sec: duration,
+    watch_completion_pct: completionPct,
     timestamp: new Date().toISOString()
   });
 
   // Pause video
-  document.getElementById('video-b').pause();
+  videoEl.pause();
 
   // Toast
   const toast = document.getElementById('rating-toast');
@@ -1188,9 +1199,9 @@ function submitModuleB() {
 function exportDataB() {
   const resps = getResponses().filter(r => r.user_id === currentUser);
   let text = '=== MODULE B RESPONSES ===\n';
-  text += 'user_id\tvideo_id\tselected_thumbnail_1\tselected_thumbnail_2\tselected_thumbnail_3\tmatch_answer\ttimestamp\n';
+  text += 'user_id\tvideo_id\tselected_thumbnail_1\tselected_thumbnail_2\tselected_thumbnail_3\tmatch_answer\twatch_duration_sec\tvideo_duration_sec\twatch_completion_pct\ttimestamp\n';
   resps.forEach(r => {
-    text += `${r.user_id}\t${r.video_id}\t${r.selected_thumbnail_1 || ''}\t${r.selected_thumbnail_2 || ''}\t${r.selected_thumbnail_3 || ''}\t${r.match_answer || ''}\t${r.timestamp}\n`;
+    text += `${r.user_id}\t${r.video_id}\t${r.selected_thumbnail_1 || ''}\t${r.selected_thumbnail_2 || ''}\t${r.selected_thumbnail_3 || ''}\t${r.match_answer || ''}\t${r.watch_duration_sec ?? 0}\t${r.video_duration_sec ?? 0}\t${r.watch_completion_pct ?? 0}\t${r.timestamp}\n`;
   });
 
   const blob = new Blob([text], { type: 'text/plain' });
@@ -1216,9 +1227,9 @@ function exportData() {
   });
 
   text += '\n=== EXPERIMENT RESPONSES (Module B) ===\n';
-  text += 'user_id\tvideo_id\tselected_thumbnail_1\tselected_thumbnail_2\tselected_thumbnail_3\ttimestamp\n';
+  text += 'user_id\tvideo_id\tselected_thumbnail_1\tselected_thumbnail_2\tselected_thumbnail_3\tmatch_answer\twatch_duration_sec\tvideo_duration_sec\twatch_completion_pct\ttimestamp\n';
   resps.forEach(r => {
-    text += `${r.user_id}\t${r.video_id}\t${r.selected_thumbnail_1 || r.selected_thumbnail || ''}\t${r.selected_thumbnail_2 || ''}\t${r.selected_thumbnail_3 || ''}\t${r.timestamp}\n`;
+    text += `${r.user_id}\t${r.video_id}\t${r.selected_thumbnail_1 || r.selected_thumbnail || ''}\t${r.selected_thumbnail_2 || ''}\t${r.selected_thumbnail_3 || ''}\t${r.match_answer || ''}\t${r.watch_duration_sec ?? 0}\t${r.video_duration_sec ?? 0}\t${r.watch_completion_pct ?? 0}\t${r.timestamp}\n`;
   });
 
   text += '\n=== POST-STUDY SURVEY ===\n';
